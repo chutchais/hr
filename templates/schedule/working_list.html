@@ -13,9 +13,23 @@ LCB1 & LCMT
 	{% next_month now as on_next_month %}
 	{% previous_month now as on_previous_month %}
 	<h1>Work schedule on {{now|date:"F Y"}}   </h1>
+		{% if hr_staff %}
+			Select department :
+			{% for department in department_list %}
+				<a href="{% url 'schedule:department-list' department %}">{{department}}</a> |
+			{% endfor %}
+			<br>
+		{% endif %}
+
 		<a href="?year={{on_previous_month.year}}&month={{on_previous_month.month}}"><small>{{on_previous_month|date:"F Y"}}</small></a> | 
-		<a href="{% url 'schedule:list' %}"><small>Current Month</small></a> | 
+		{% if department %}
+			<a href="{% url 'schedule:department-list' department %}"><small>Current Month</small></a>
+		{% else %}
+			<a href="{% url 'schedule:list' %}"><small>Current Month</small></a>
+		{% endif %}
+		 | 
 		<a href="?year={{on_next_month.year}}&month={{on_next_month.month}}"><small>{{on_next_month|date:"F Y"}}</small></a>
+    
     <div class="row">
 	    <div class="col">
 	      {% for section in section_list %}
@@ -45,6 +59,7 @@ LCB1 & LCMT
 								    	</td>
 								    {% else %}
 										<td><a href='{% url "schedule:add" section.name em.en %}?year={{now.year}}&month={{now.month}}&day={{i|add:1}}'>--</a></td>
+										<!-- <td>--</td> -->
 								    {% endif %}
 								{% endfor %}
 
