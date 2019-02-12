@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% load schedule_tag %}
+
+{% block title %}
+LCB1 & LCMT 
+{% endblock %}
+
+
+
+
+{% block content %}
+<div class="container">
+	{% next_month now as on_next_month %}
+	{% previous_month now as on_previous_month %}
+	<h1>Work schedule on {{now|date:"F Y"}}   </h1>
+		<a href="?year={{on_previous_month.year}}&month={{on_previous_month.month}}"><small>{{on_previous_month|date:"F Y"}}</small></a> | 
+		<a href="{% url 'schedule:list' %}"><small>Current Month</small></a> | 
+		<a href="?year={{on_next_month.year}}&month={{on_next_month.month}}"><small>{{on_next_month|date:"F Y"}}</small></a>
+    <div class="row">
+	    <div class="col">
+	      {% for section in section_list %}
+				<h3>{{section}} </h3> 
+				<table border="1">
+					<tr>
+						<th>Employee</th>
+						<th>en</th>
+		   				{% for i in now|range_days %}
+						    <th>{{ forloop.counter }}</th>
+						{% endfor %}
+	 				</tr>
+					<td>
+						{% for em in section.employees.all|dictsort:"en" %}
+							<tr>
+								<td>{{em}}</td>
+								<td>{{em.en}}</td>
+
+								{% for i in now|range_days %}
+									<!-- Loop in working list -->
+									{% get_working working_list em now.year now.month i|add:1 as user_working %}
+								    {% if user_working %}
+								    	<td {{user_working.get_working_style|safe}} > 
+								    		<a href='{% url "schedule:detail" user_working.pk %}'>
+								    		{{user_working.workingcode.name}}
+								    		</a>
+								    	</td>
+								    {% else %}
+										<td><a href='{% url "schedule:add" section.name em.en %}?year={{now.year}}&month={{now.month}}&day={{i|add:1}}'>--</a></td>
+								    {% endif %}
+								{% endfor %}
+
+							</tr>
+						{% endfor %}
+					</td>
+				</table>
+				<!-- Show Working Code -->
+				<table>
+				{% for working in section.workingcodes.all %}
+					<tr>
+						<td {{working.get_color_style|safe}}>{{working.name}}</td> <td>({{working.start_time}} to {{working.end_time}}) </td>
+					</tr>
+				{% endfor %}
+				</table>
+			{% endfor %}
+	    </div>
+  	</div>
+</div>
+{% endblock content %}

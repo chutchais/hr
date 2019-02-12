@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% load schedule_tag %}
+
+{% block title %}
+Create working
+{% endblock %}
+
+
+
+
+{% block content %}
+	<div class="container">
+		<h1>{{title}}</h1>
+		<form method="post">
+	        {% csrf_token %}
+	        {{ form.as_p }}
+	        <button type="submit" class="btn btn-primary">{{title}}</button>
+	    </form>
+	    {% if object %}
+	    <a href="{% url 'schedule:delete' object.pk %}">Delete</a>
+	    {% endif %}
+	</div>
+{% endblock content %}

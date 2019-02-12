@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block title %}
+LCB1 & LCMT 
+{% endblock %}
+
+
+
+
+{% block content %}
+<div class="container">
+
+       
+
+              
+
+    <div class="row">
+        <div class="col-md-6">
+            <div id="main">
+                    <!-- <input v-model="search_term" placeholder="edit me"> -->
+                    
+                <!-- <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search"
+                v-model="search_term" v-on:change="searchCompany()"> -->
+
+                <input class="form-control mr-sm-2" placeholder="Search" 
+                v-model="search_text" v-on:input="searchCompany()" type="text" />
+                
+              </form>
+                <h2>Company Information</h2>
+                <small v-if="companys.length > 0 && search_text.length > 0">Found : ${companys.length} record(s)</small>
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">Description</th>
+                        <th scope="col"></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="company in companys">
+                        <th scope="row">${company.name}</th>
+                        <td>${company.description}</td>
+                        <td>
+                            <button class="btn btn-info" v-on:click="getCompany(company.company_id)">Edit</button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+
+
+{% block java_content %}
+<script>
+
+
+new Vue({
+    el: '#main',
+    delimiters: ['${','}'],
+    data: {
+      companys: [],
+      currentCompany : {},
+      search_text :''
+    },
+    mounted: function() {
+        this.getCompanys();
+    },
+    methods: {
+        // Start Methode
+        getCompanys: function() {
+          let api_url = '/api/company/';
+        //   if(this.search_term!==''||this.search_term!==null) {
+        //     api_url = '/api/article/?search=' + this.search_term
+        //   }
+        //   this.loading = true;
+          this.$http.get(api_url)
+              .then((response) => {
+                this.companys = response.data.results;
+                // console.log(this.companys)
+                this.loading = false;
+              })
+              .catch((err) => {
+                this.loading = false;
+                console.log(err);
+              })
+        },//end get companys
+        getCompany: function(company_id) {
+          console.log(company_id)
+        //   this.loading = true;
+          this.$http.get('/api/company/' + company_id +'/')
+              .then((response) => {
+                this.currentCompany = response.data;
+                // $("#editArticleModal").modal('show');
+                this.loading = false;
+              })
+              .catch((err) => {
+                this.loading = false;
+                console.log(err);
+              })
+        },
+        searchCompany: function(text) {
+          if (this.search_text.length > 0){
+            // console.log(this.search_text)
+            this.$http.get('/api/company/?search=' + this.search_text)
+              .then((response) => {
+                this.companys = response.data.results;
+                this.loading = false;
+                // console.log(this.companys.results)
+              })
+              .catch((err) => {
+                this.loading = false;
+                console.log(err);
+              })
+          }else{
+            // console.log('clear')
+            this.getCompanys()
+          }
+          
+          
+        //   this.loading = true;
+        //   this.$http.get('/api/company/')
+        //       .then((response) => {
+        //         this.currentCompany = response.data;
+        //         // $("#editArticleModal").modal('show');
+        //         this.loading = false;
+        //       })
+        //       .catch((err) => {
+        //         this.loading = false;
+        //         console.log(err);
+        //       })
+        },
+        // End Methode
+    }
+
+    });
+</script>
+{% endblock java_content %}
