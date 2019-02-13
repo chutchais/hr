@@ -8,11 +8,11 @@ from .views import WorkingListView,WorkingSectionListView,WorkingCreate,WorkingU
 urlpatterns = [
     url(r'^$', WorkingListView.as_view(), name='list'),
    
-    path('/<slug:section>/<slug:en>/add', WorkingCreate.as_view(), name='add'),
+    path('<slug:section>/<slug:en>/add', WorkingCreate.as_view(), name='add'),
     # path('/<slug:section>/<slug:en>/<int:year>/<int:month>/<int:day>', WorkingUpdate.as_view(), name='update')
-    path('/<int:pk>', WorkingUpdate.as_view(), name='detail'),
-    path('/<slug:pk>/delete', WorkingDelete.as_view(), name='delete'),
-    path('/<slug:department>', WorkingListView.as_view(), name='department-list'),
+    path('<int:pk>', WorkingUpdate.as_view(), name='detail'),
+    path('<slug:pk>/delete', WorkingDelete.as_view(), name='delete'),
+    path('<slug:department>', WorkingListView.as_view(), name='department-list'),
 
     # url(r'(?P<slug>[-\w]+)/create$', BayPlanCreateView.as_view(),name='create'),
     # url(r'(?P<slug>[-\w]+)/delete$', BayPlanDeleteView.as_view(),name='delete'),

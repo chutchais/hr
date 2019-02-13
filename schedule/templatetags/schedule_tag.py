@@ -10,6 +10,15 @@ import os
 
 # @register.simple_tag
 
+
+@register.simple_tag
+def working_in_sction(working_list, section, status):
+	i=0
+	for working in working_list:
+		if working.user.section == section and working.status == status :
+			i=i+1
+	return i
+
 @register.filter()
 def range_days(date):
 	try :

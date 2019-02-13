@@ -55,7 +55,11 @@ class WorkingCreate(PassRequestToFormViewMixin,LoginRequiredMixin,CreateView):
 
 	def form_valid(self, form):
 		# form.instance.user = self.request.user
-		return super(WorkingCreate, self).form_valid(form)
+		# print ('On form_valid %s' % self.request.user)
+		s = super(WorkingCreate, self).form_valid(form)
+		form.instance.logs.create(note= ('[ work code : %s] %s ' %(form.instance.workingcode.name,form.instance.note)) ,
+							user=self.request.user,log_type='ADD')
+		return s
 
 	def get_context_data(self, **kwargs):
 		context = super(WorkingCreate, self).get_context_data(**kwargs)        
@@ -87,6 +91,14 @@ class WorkingUpdate(UpdateView):
 		form.fields['workingcode'].queryset = WorkingCode.objects.filter(section=self.object.user.section)
 		return form
 
+	def form_valid(self, form):
+		# form.instance.user = self.request.user
+		# print ('On form_valid %s' % self.request.user)
+		s = super(WorkingUpdate, self).form_valid(form)
+		form.instance.logs.create(note= ('[ work code : %s] %s ' %(form.instance.workingcode.name,form.instance.note)) ,
+							user=self.request.user,log_type='CHG')
+		return s
+
 class WorkingDelete(DeleteView):
 	model = Working
 	success_url = reverse_lazy('schedule:list')
@@ -103,6 +115,9 @@ class WorkingListView(LoginRequiredMixin,ListView):
 		# print(user.groups.all())
 		year = self.request.GET.get('year', None)
 		month = self.request.GET.get('month', None)
+
+		# display mode (mode=None --> show Working Code(default) , mode=Status -->show status mode)
+		mode = self.request.GET.get('mode', None)
 
 		if year and month:
 			report_date 	= datetime.date(int(year),int(month),1)
@@ -135,7 +150,10 @@ class WorkingListView(LoginRequiredMixin,ListView):
 										user__section__department = department,
 										working_date__year = report_date.year,
 										working_date__month = report_date.month))
+		if mode :
+			context['mode'] = mode
 
+		
 		return context
 
 	def get_queryset(self):

@@ -175,7 +175,7 @@ class WorkingAdmin(admin.ModelAdmin):
     list_filter = [WorkingDateListFilter,SectionListFilter,'status']
     list_display = ('user',get_en,get_section,'working_date','workingcode',status_colored,'status')
     # list_editable = ('get_color')
-    readonly_fields = ['status','created_date','modified_date','approved_date',
+    readonly_fields = ['created_date','modified_date','approved_date',
                         'accepted_date','accepted_result','completed_date','completed']
     form = WorkingForm
 

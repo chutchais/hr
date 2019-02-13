@@ -11,13 +11,65 @@ Create working
 {% block content %}
 	<div class="container">
 		<h1>{{title}}</h1>
-		<form method="post">
-	        {% csrf_token %}
-	        {{ form.as_p }}
-	        <button type="submit" class="btn btn-primary">{{title}}</button>
-	    </form>
-	    {% if object %}
-	    <a href="{% url 'schedule:delete' object.pk %}">Delete</a>
-	    {% endif %}
+		{% if object %}
+			<h3>{{object.user}} on {{object.working_date}}</h3>
+		{% endif %}
+		<div class="row">
+	    	<div class="col">
+				<form method="post">
+			        {% csrf_token %}
+			        {{ form.as_p }}
+			        <button type="submit" class="btn btn-primary">{{title}}</button>
+			        {% if object %}
+			        	{% if object.status == 'DRAFT' or object.status == 'REJECT' %}
+			    			<a class="btn btn-danger" role="button" href="{% url 'schedule:delete' object.pk %}">Delete</a>
+			    		{% endif %}
+			    	{% endif %}
+			    </form>
+			    {% if object %}
+			    	<h3>General Infomation</h3>
+			    	<ul class="list-group list-group-flush">
+			    		<li class="list-group-item">
+			    				<h6>Status 
+			    					<span class="{{object.get_status_style}}">{{object.status}}</span>
+			    				</h6>
+			    		</li>
+						  <li class="list-group-item">Created on : {{object.created_date}}  ({{object.created_date|timesince}})</li>
+						  <li class="list-group-item">Last update on : {{object.modified_date}} ({{object.modified_date|timesince}})</li>
+					  
+					 </ul>
+
+			    {% endif %}
+			</div>
+			<div class="col">
+				<h3>Logs</h3>
+				
+						{% if object %}
+							<table class="table table-striped">
+							<thead>
+								<tr>
+									<th>Date</th>
+									<th>type</th>
+									<th>Note</th>
+									<th>By</th>
+								</tr>
+							</thead>
+							<tbody>
+					    	{% for log in object.logs.all %}
+					    	<tr>
+					    		<td>{{log.created_date}}</td>
+								<td>{{log.log_type}}</td>
+								<td>{{log.note}}</td>
+								<td>{{log.user}}</td>
+					    	</tr>
+					    	{% endfor %}
+					    	</tbody>
+					    	</table>
+					    {% endif %}
+				
+			</div>
+
+		</div>
+
 	</div>
 {% endblock content %}

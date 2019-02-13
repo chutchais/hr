@@ -40,7 +40,7 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^login', LoginView.as_view(),name='login'),
     url(r'^logout', LogoutView.as_view(),name='logout'),
-    url(r'^schedule', include(('schedule.urls','schedule'),namespace='schedule')),
+    url(r'^schedule/', include(('schedule.urls','schedule'),namespace='schedule')),
 
     url(r'^',views.home ,name='home'),
     # url(r'^api/', include(router.urls)),
