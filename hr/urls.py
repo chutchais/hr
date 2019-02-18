@@ -16,7 +16,7 @@ Including another URLconf
 from django.contrib import admin
 # from django.urls import pathinclude
 from django.conf.urls import include, url
-# from .routers import router
+from .routers import router
 from django.views.generic import TemplateView
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
@@ -28,14 +28,6 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    # Web page
-    # url(r'^company/', include('company.urls')),
-    # url(r'^',views.home ,name='home'),
-    # path('company',include('company.urls') ,name='company'),
-    # path('',views.home ,name='home'),
-    
-    
-
     # Admin
     url(r'^admin/', admin.site.urls),
     url(r'^login', LoginView.as_view(),name='login'),
@@ -43,14 +35,16 @@ urlpatterns = [
     url(r'^schedule/', include(('schedule.urls','schedule'),namespace='schedule')),
     url(r'^employee/', include(('employee.urls','employee'),namespace='employee')),
 
+    
+    url(r'^api/', include(router.urls)),
+    url(r'^api-auth/', include('rest_framework.urls',
+                               namespace='rest_framework')),
+
     url(r'^',views.home ,name='home'),
-    # url(r'^api/', include(router.urls)),
-    # url(r'^api-auth/', include('rest_framework.urls',
-    #                            namespace='rest_framework')),
     # # Token
-    # url(r'^api/login/', include(('employee.urls','user'),namespace='login')),
-    # url(r'^api/token/$', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    # url(r'^api/token/refresh/$', TokenRefreshView.as_view(), name='token_refresh'),
+    url(r'^api/login/', include(('employee.urls','user'),namespace='login')),
+    url(r'^api/token/$', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    url(r'^api/token/refresh/$', TokenRefreshView.as_view(), name='token_refresh'),
 ]
 
 from django.conf.urls.static import static
