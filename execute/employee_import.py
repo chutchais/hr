@@ -3,7 +3,7 @@ import os
 
 def upload_employee(data):
 	try :
-		url = "http://127.0.0.1:8000/employee/upload"
+		url = "http://192.168.10.20:8011/employee/upload"
 		service = 'employee'
 		import urllib3
 		http = urllib3.PoolManager()

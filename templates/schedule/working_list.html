@@ -150,7 +150,7 @@ LCB1 & LCMT
 						{% for em in section.employees.all|dictsort:"en" %}
 							<tr>
 								<td>{{em}}</td>
-								<td><a href="{% url 'employee:employee-detail' em.pk %}">{{em.en}}</a></td>
+								<td><a href="{% url 'employee:employee-detail' em.pk %}">{{em.en|slice:"-4:"}}</a></td>
 
 								{% for i in now|range_days %}
 									<!-- Loop in working list -->
@@ -162,7 +162,7 @@ LCB1 & LCMT
 								    		{% endif %}
 
 									    	{% if mode == 'status' %}
-										    	<td>
+										    	<td class="text-center">
 									    			<a href='{% url "schedule:detail" user_working.pk %}?next={{ request.get_full_path| urlencode }}'>
 									    			<span class="{{user_working.get_status_style}}">{{user_working.workingcode.name}}</span>
 									    			</a>
@@ -178,7 +178,7 @@ LCB1 & LCMT
 								    {% else %}
 								    	<!-- Check permission request_working -->
 								    	{% if perms.schedule.add_working %}
-											<td><a href='{% url "schedule:add" section.name em.en %}?year={{now.year}}&month={{now.month}}&day={{i|add:1}}&next={{ request.get_full_path| urlencode }}'>--</a></td>
+											<td class="text-center"><a href='{% url "schedule:add" section.name em.en %}?year={{now.year}}&month={{now.month}}&day={{i|add:1}}&next={{ request.get_full_path| urlencode }}'>--</a></td>
 										{% else %}
 											<td>--</td>
 										{% endif %}
