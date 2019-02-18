@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% load schedule_tag %}
+
+{% block title %}
+		Status detail
+{% endblock %}
+
+{% block stylesheet %}
+   <style type="text/css">
+   table {
+    max-width: 100%;
+	}
+
+    th {
+    background-color: #C0DAFF;
+    color: black;
+	}
+	</style>
+    {% endblock stylesheet %}
+
+{% block content %}
+
+<div class="container">
+  <div class="row">
+      <div class="col">
+      	<h1>Working schedule list of {{status}}</h1>
+      	<table border=1 width="1024">
+					<thead>
+					<tr>
+						<th>Name</th>
+						<th>En</th>
+						<th>Section</th>
+						<th>Working Date</th>
+						<th>Code</th>
+						<th>Status</th>
+						<th>Last update</th>
+	 				</tr>
+	 				</thead>
+	 				<tbody>
+	 					{% for object in  object_list %}
+	 							<tr>
+									<td>{{object.user}}</td>
+									<td>
+										<a href='{% url "employee:employee-detail" object.user.pk %}'>
+										{{object.user.en}}
+										</a>
+									</td>
+									<td>{{object.user.section}}</td>
+									<td>{{object.working_date}}</d>
+										
+									<td {{object.workingcode.get_color_style|safe}}><a href='{% url "schedule:detail" object.pk %}'>{{object.workingcode.name}}</a></td>
+									<td>
+										<span class="{{object.get_status_style}}">{{object.status}}</span>
+									</td>
+									<td>{{object.modified_date}}</td>
+				 				</tr>
+	 					{% endfor %}
+	 				</tbody>
+	 	</table>
+      </div>
+  </div>
+</div>
+{% endblock content %}

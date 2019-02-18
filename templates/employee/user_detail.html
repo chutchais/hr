@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% load schedule_tag %}
+
+{% block title %}
+Employee Detail 
+{% endblock %}
+
+
+  {% block stylesheet %}
+         <style type="text/css">
+         table {
+          max-width: 100%;
+        }
+
+          th {
+          background-color: #C0DAFF;
+          color: black;
+        }
+      </style>
+  {% endblock stylesheet %}
+
+
+{% block content %}
+<div class="container">
+  <div class="row">
+      <div class="col">
+        {% queryset_to_list object.workings.all as working_list %}
+
+            {% add_month now 2 as start_month %}
+            <h1>
+                {{object}} -- {{object.section}}
+                
+                {% if mode == 'status' %}
+                      <a href="{% url 'employee:employee-detail' object.pk %}"><small><small><small>working code mode</small></small></small></a>
+                   
+                  {% else %}
+                    <a href="?{% query_transform request mode='status' %}"><small><small><small>status mode</small></small></small></a>
+                    
+                  {% endif %}
+
+            </h1>
+
+              <!-- Show Status  -->
+              {% working_in_sction working_list object.section 'DRAFT' as status_draft %}
+              {% working_in_sction working_list object.section 'PRE_APPROVE' as status_pre_approve %}
+              {% working_in_sction working_list object.section 'APPROVE' as status_approve %}
+              {% working_in_sction working_list object.section 'ACCEPT' as status_accept %}
+              {% working_in_sction working_list object.section 'REJECT' as status_reject %}
+              {% working_in_sction working_list object.section 'COMPLETE' as status_complete %}
+              {% working_in_sction working_list object.section 'ACKNOWLEDGE' as status_acknowledge %}
+
+              {% if status_draft > 0 %}
+            <button type="button" class="btn btn-light">
+              Draft <span class="badge badge-light">{{status_draft}}</span>
+            </button>
+          {% endif %}
+
+          {% if status_pre_approve > 0 %}
+            <button type="button" class="btn btn-info">
+              Pre-Approve <span class="badge badge-light">{{status_pre_approve}}</span>
+            </button>
+          {% endif %}
+
+          {% if status_approve > 0 %}
+            <button type="button" class="btn btn-primary">
+              Approve <span class="badge badge-light">{{status_approve}}</span>
+            </button>
+          {% endif %}
+
+          {% if status_acknowledge > 0 %}
+            <button type="button" class="btn btn-warning">
+              Acknowledge <span class="badge badge-light">{{status_acknowledge}}</span>
+            </button>
+          {% endif %}
+
+          {% if status_accept > 0 %}
+            <button type="button" class="btn btn-success">
+              Accept <span class="badge badge-light">{{status_accept}}</span>
+            </button>
+          {% endif %}
+
+          {% if status_reject > 0 %}
+            <button type="button" class="btn btn-danger">
+              Reject <span class="badge badge-light">{{status_reject}}</span>
+            </button>
+          {% endif %}
+
+          {% if status_complete > 0 %}
+            <button type="button" class="btn btn-secondary">
+              Complete <span class="badge badge-light">{{status_complete}}</span>
+            </button>
+          {% endif %}
+
+              <!-- End show Status  -->
+            <table border=1 width="1024">
+                <thead>
+                <tr>
+                  <th>Year</th>
+                  <th>Month</th>
+                    {% for i in i|rjust:31 %}
+                      <th class="text-center">{{ forloop.counter }}</th>
+                    {% endfor %}
+                </tr>
+                </thead>
+
+
+                <tdata>
+                    {% for i in i|rjust:6 %}
+                      {% sub_month start_month 1 as start_month %}
+                      <tr>
+                        <td>{{start_month|date:"Y"}}</td>
+                        <td>
+                            <a href="{% url 'schedule:department-list' object.section.department %}?year={{start_month.year}}&month={{start_month.month}}">
+                            {{start_month|date:"F"}}
+                        </td>
+                         {% for x in x|rjust:31 %}
+                         {% get_working working_list object start_month.year start_month.month forloop.counter as user_working %}
+                         
+                              {% if user_working %}
+                      
+                                  {% if mode == 'status' %}
+                                        <td class="text-center">
+                                          <a href='{% url "schedule:detail" user_working.pk %}?next={{ request.get_full_path| urlencode }}'>
+                                          <span class="{{user_working.get_status_style}}">{{user_working.workingcode.name}}</span>
+                                          </a>
+                                        </td>
+                                      {% else %}
+                                        <td {{user_working.get_working_style|safe}} > 
+                                          <a href='{% url "schedule:detail" user_working.pk %}?next={{ request.get_full_path| urlencode }}'>
+                                          {{user_working.workingcode.name}}
+                                          </a>
+                                        </td>
+                                      {% endif %}
+                                    
+                                  {% else %}
+                                    <!-- Check permission request_working -->
+                                    {% if perms.schedule.add_working %}
+                                    <td class="text-center"><a href='{% url "schedule:add" object.section.name object.en %}?year={{start_month.year}}&month={{start_month.month}}&day={{forloop.counter}}&next={{ request.get_full_path| urlencode }}'>--</a></td>
+                                  {% else %}
+                                    <td class="text-center">--</td>
+                                  {% endif %}
+                              {% endif %}
+
+
+                        {% endfor %}
+                      </tr>
+                    {% endfor %}
+                </tdata>
+          </table>
+
+          <table>
+          {% for working in object.section.workingcodes.all %}
+            <tr>
+              <td {{working.get_color_style|safe}}>{{working.name}}</td> <td>({{working.start_time}} to {{working.end_time}}) </td>
+            </tr>
+          {% endfor %}
+          </table>
+
+      </div>
+  </div>
+</div>
+{% endblock content %}

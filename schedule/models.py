@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.contenttypes.fields import GenericRelation
+# from django.core.urlresolvers import reverse
 
 from django.core.exceptions import ValidationError
 from colorfield.fields import ColorField
@@ -92,9 +93,11 @@ class Working(models.Model):
 
 	class Meta:
 		permissions = (
-			("request_working", "Can request working schedule"),
+			("create_working", "Can create working schedule"),
+			("pre_approve_working", "Can pre-approve working schedule"),
 			("approve_working", "Can approve working schedule"),
-			("accept_working", "Can accept/reject working schedule"),
+			("accept_reject_working", "Can accept/reject working schedule"),
+			("complete_working", "Can complete working schedule"),
 		)
 
 	def clean(self):

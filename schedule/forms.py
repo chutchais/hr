@@ -1,10 +1,11 @@
-from django.forms import ModelForm
+from django.forms import ModelForm,Textarea
 from django import forms
 from .models import Working
 import datetime
 
 class WorkingForm(ModelForm):
 	working_date = forms.CharField(disabled=True)
+	next 		 = forms.CharField(widget=forms.HiddenInput(),required=False,disabled=True)
 	# user = forms.CharField(disabled=True)
 	def __init__(self, *args, **kwargs):
 		self.request = kwargs.pop("request")
@@ -15,6 +16,9 @@ class WorkingForm(ModelForm):
 	class Meta:
 		model = Working
 		fields = ['user','working_date','workingcode','note']
+		widgets = {
+            'note': Textarea(attrs={'cols': 50, 'rows': 3}),
+   			}
 
 	def clean(self):
 		# workingcode = self.cleaned_data.pop('workingcode')

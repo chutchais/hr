@@ -2,7 +2,7 @@
 {% load schedule_tag %}
 
 {% block title %}
-LCB1 & LCMT 
+Employee 
 {% endblock %}
 
 
@@ -16,7 +16,7 @@ LCB1 & LCMT
     background-color: #C0DAFF;
     color: black;
 	}
-	</style>
+</style>
     {% endblock stylesheet %}
 
 
@@ -64,7 +64,6 @@ LCB1 & LCMT
     <div class="row">
 	    <div class="col">
 	      {% for section in section_list %}
-	      
 	      		{% working_in_sction working_list section 'DRAFT' as status_draft %}
 	      		{% working_in_sction working_list section 'PRE_APPROVE' as status_pre_approve %}
 	      		{% working_in_sction working_list section 'APPROVE' as status_approve %}
@@ -76,59 +75,45 @@ LCB1 & LCMT
 					{{section}} 
 
 					{% if status_draft > 0 %}
-					<a href="{% url 'schedule:status-list' 'DRAFT' %}">
 						<button type="button" class="btn btn-light">
 						  Draft <span class="badge badge-light">{{status_draft}}</span>
 						</button>
-					</a>
 					{% endif %}
 
 					{% if status_pre_approve > 0 %}
-					<a href="{% url 'schedule:status-list' 'PRE_APPROVE' %}">
 						<button type="button" class="btn btn-info">
 						  Pre-Approve <span class="badge badge-light">{{status_pre_approve}}</span>
 						</button>
-					</a>
 					{% endif %}
 
 					{% if status_approve > 0 %}
-					<a href="{% url 'schedule:status-list' 'APPROVE' %}">
 						<button type="button" class="btn btn-primary">
 						  Approve <span class="badge badge-light">{{status_approve}}</span>
 						</button>
-					</a>
 					{% endif %}
 
 					{% if status_acknowledge > 0 %}
-					<a href="{% url 'schedule:status-list' 'ACKNOWLEDGE' %}">
 						<button type="button" class="btn btn-warning">
 						  Acknowledge <span class="badge badge-light">{{status_acknowledge}}</span>
 						</button>
-					</a>
 					{% endif %}
 
 					{% if status_accept > 0 %}
-					<a href="{% url 'schedule:status-list' 'ACCEPT' %}">
 						<button type="button" class="btn btn-success">
 						  Accept <span class="badge badge-light">{{status_accept}}</span>
 						</button>
-					</a>
 					{% endif %}
 
 					{% if status_reject > 0 %}
-					<a href="{% url 'schedule:status-list' 'REJECT' %}">
 						<button type="button" class="btn btn-danger">
 						  Reject <span class="badge badge-light">{{status_reject}}</span>
 						</button>
-					</a>
 					{% endif %}
 
 					{% if status_complete > 0 %}
-					<a href="{% url 'schedule:status-list' 'COMPLETE' %}">
 						<button type="button" class="btn btn-secondary">
 						  Complete <span class="badge badge-light">{{status_complete}}</span>
 						</button>
-					</a>
 					{% endif %}
 
 					
@@ -138,8 +123,8 @@ LCB1 & LCMT
 				<table border=1 width="1024">
 					<thead>
 					<tr>
-						<th>Name</th>
-						<th>En</th>
+						<th>Employee</th>
+						<th>en</th>
 		   				{% for i in now|range_days %}
 						    <th class="text-center">{{ forloop.counter }}</th>
 						{% endfor %}
@@ -150,26 +135,23 @@ LCB1 & LCMT
 						{% for em in section.employees.all|dictsort:"en" %}
 							<tr>
 								<td>{{em}}</td>
-								<td><a href="{% url 'employee:employee-detail' em.pk %}">{{em.en}}</a></td>
+								<td>{{em.en}}</td>
 
 								{% for i in now|range_days %}
 									<!-- Loop in working list -->
 									{% get_working working_list em now.year now.month i|add:1 as user_working %}
 								    {% if user_working %}
 								    	
-								    		{% if department %}
-								    		{% else %}
-								    		{% endif %}
 
 									    	{% if mode == 'status' %}
 										    	<td>
-									    			<a href='{% url "schedule:detail" user_working.pk %}?next={{ request.get_full_path| urlencode }}'>
+									    			<a href='{% url "schedule:detail" user_working.pk %}?next={% url "employee:employee-detail" em.pk %}'>
 									    			<span class="{{user_working.get_status_style}}">{{user_working.workingcode.name}}</span>
 									    			</a>
 										    	</td>
 										    {% else %}
 										    	<td {{user_working.get_working_style|safe}} > 
-										    		<a href='{% url "schedule:detail" user_working.pk %}?next={{ request.get_full_path| urlencode }}'>
+										    		<a href='{% url "schedule:detail" user_working.pk %}?next={% url "employee:employee-detail" em.pk %}'>
 										    		{{user_working.workingcode.name}}
 										    		</a>
 										    	</td>
@@ -178,12 +160,11 @@ LCB1 & LCMT
 								    {% else %}
 								    	<!-- Check permission request_working -->
 								    	{% if perms.schedule.add_working %}
-											<td><a href='{% url "schedule:add" section.name em.en %}?year={{now.year}}&month={{now.month}}&day={{i|add:1}}&next={{ request.get_full_path| urlencode }}'>--</a></td>
+											<td><a href='{% url "schedule:add" section.name em.en %}?year={{now.year}}&month={{now.month}}&day={{i|add:1}}'>--</a></td>
 										{% else %}
 											<td>--</td>
 										{% endif %}
 								    {% endif %}
-
 								{% endfor %}
 
 							</tr>

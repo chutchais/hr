@@ -10,10 +10,12 @@ Create working
 
 {% block content %}
 	<div class="container">
-		<h1>{{title}}</h1>
-		{% if object %}
-			<h3>{{object.user}} on {{object.working_date}}</h3>
-		{% endif %}
+		<h1>{{title}} : 
+			{% if object %}
+			<small>{{object.user}} on {{object.working_date}}</small>
+			{% endif %}
+		</h1>
+		
 		<div class="row">
 	    	<div class="col">
 				<form method="post">
@@ -22,7 +24,11 @@ Create working
 			        <button type="submit" class="btn btn-primary">{{title}}</button>
 			        {% if object %}
 			        	{% if object.status == 'DRAFT' or object.status == 'REJECT' %}
-			    			<a class="btn btn-danger" role="button" href="{% url 'schedule:delete' object.pk %}">Delete</a>
+			        		{% if perms.schedule.delete_working %}
+			    				<a class="btn btn-danger" role="button" href="{% url 'schedule:delete' object.pk %}">Delete</a>
+			    			{% else %}
+			    				No permission to delete
+			    			{% endif %}
 			    		{% endif %}
 			    	{% endif %}
 			    </form>
@@ -32,7 +38,47 @@ Create working
 			    		<li class="list-group-item">
 			    				<h6>Status 
 			    					<span class="{{object.get_status_style}}">{{object.status}}</span>
+
+			    					{% if object.status == 'DRAFT' or object.status == 'REJECT' %}
+			    						{% if perms.schedule.create_working %}
+			    							<a class="btn btn-info" role="button" href="{% url 'schedule:process' object.pk 'PRE_APPROVE' %}?next={{next|urlencode}}">Send to Pre-Approve</a>
+			    						{% endif %}
+			    					{% endif %}
+
+			    					{% if object.status == 'PRE_APPROVE' %}
+			    						{% if perms.schedule.pre_approve_working %}
+			    							<a class="btn btn-primary" role="button" href="{% url 'schedule:process' object.pk 'APPROVE' %}?next={{next|urlencode}}">Send to Approve</a>
+			    						{% endif %}
+			    					{% endif %}
+
+			    					{% if object.status == 'APPROVE' %}
+			    						{% if perms.schedule.approve_working %}
+			    							<a class="btn btn-warning" role="button" href="{% url 'schedule:process' object.pk 'ACKNOWLEDGE' %}?next={{next|urlencode}}">Send to Payroll Officer</a>
+			    						{% endif %}
+			    					{% endif %}
+
+			    					{% if object.status == 'ACKNOWLEDGE' %}
+			    						{% if perms.schedule.accept_reject_working %}
+				    						<a class="btn btn-success" role="button" href="{% url 'schedule:process' object.pk 'ACCEPT' %}?next={{next}}">Accept</a>
+				    						<a class="btn btn-danger" role="button" href="{% url 'schedule:process' object.pk 'REJECT' %}?next={{next|urlencode}}">Reject</a>
+			    						{% endif %}
+			    					{% endif %}
+
+			    					{% if object.status == 'ACCEPT' %}
+			    						{% if perms.schedule.complete_working %}
+			    							<a class="btn btn-secondary" role="button" href="{% url 'schedule:process' object.pk 'COMPLETE' %}?next={{next|urlencode}}">Complete</a>
+			    						{% endif %}
+			    					{% endif %}
+
 			    				</h6>
+
+			    				<!-- Show Button for move next -->
+
+
+
+
+
+
 			    		</li>
 						  <li class="list-group-item">Created on : {{object.created_date}}  ({{object.created_date|timesince}})</li>
 						  <li class="list-group-item">Last update on : {{object.modified_date}} ({{object.modified_date|timesince}})</li>
