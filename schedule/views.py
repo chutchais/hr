@@ -590,7 +590,7 @@ class WorkingSectionMonthlyView(LoginRequiredMixin,ListView):
 		w = Working.objects.filter(
 									user__section  = section,
 									working_date__year = report_date.year,
-									working_date__month = report_date.month)
+									working_date__month = report_date.month).exclude(user__pk=1)
 		# print(w.count())
 		context['working_list'] = w
 			# context['section_list'] = list(Section.objects.filter(department = section.department))
@@ -631,7 +631,7 @@ def export_working_xls(request,section,year,month):
 		report_date 	= timezone.now()
 
 
-	objSection = Section.objects.get(name=section) 
+	objSection = Section.objects.get(name=section)
 	department = objSection.department.name
 
 
@@ -659,7 +659,7 @@ def export_working_xls(request,section,year,month):
 
 
 	row_num=4
-	rows = User.objects.filter(section__name = section).order_by('team','en').values_list('first_name','last_name' ,'en')
+	rows = User.objects.filter(section__name = section).exclude(id=1).order_by('team','en').values_list('first_name','last_name' ,'en')
 	for row in rows:
 		row_num += 1
 		for col_num in range(len(row)):

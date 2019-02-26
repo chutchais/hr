@@ -137,6 +137,7 @@ LCB1 & LCMT
 				<table border=1 width="1024">
 					<thead>
 					<tr>
+						<th></th>
 						<th>Name</th>
 						<th>En</th>
 		   				{% for i in now|range_days %}
@@ -157,55 +158,55 @@ LCB1 & LCMT
 							{% get_working_by_month em.pk now.year now.month as list_working_date %}
 
 							
-
+							{% if em.pk != 1 %}
 							
+									<tr>
+										<td>{{em.company}}</td>
+										<td>{{em.first_name}}</td>
+										<td><a href="{% url 'employee:employee-detail' em.pk %}">{{em.en|slice:"-4:"}}</a></td>
+										
+										
+										{% for i in now|range_days %}
+											<!-- Loop in working list -->
+											<!-- Check in working list first -->
+											{% if i|add:1 in list_working_date %}
 
-							<tr>
-								<td>{{em}}</td>
-								<td><a href="{% url 'employee:employee-detail' em.pk %}">{{em.en|slice:"-4:"}}</a></td>
-								
-								
-								{% for i in now|range_days %}
-									<!-- Loop in working list -->
-									<!-- Check in working list first -->
-									{% if i|add:1 in list_working_date %}
+													{% get_working em now.year now.month i|add:1 as user_working %}
 
-											{% get_working em now.year now.month i|add:1 as user_working %}
+												    {% if user_working %}
+												    	
 
-										    {% if user_working %}
-										    	
+													    	{% if mode == 'status' %}
+														    	<td class="text-center">
+													    			<a href='{% url "schedule:detail" user_working.pk %}?next={{ request.get_full_path| urlencode }}'>
+													    			<span class="{{user_working.get_status_style}}">{{user_working.workingcode.name}}</span>
+													    			</a>
+														    	</td>
+														    {% else %}
+														    	<td  {{user_working.get_working_style|safe}}> 
+														    		<a href='{% url "schedule:detail" user_working.pk %}?next={{ request.get_full_path| urlencode }}'>
+														    		{{user_working.workingcode.name}}
+														    		</a>
+														    	</td>
+													    	{% endif %}
+												    {% endif %}
+											<!-- Not in working list -->
+											{% else %}
+												    	<!-- Check permission request_working -->
+												    	{% if perms.schedule.add_working %}
+															<td class="text-center"><a href='{% url "schedule:add" section.name em.en %}?year={{now.year}}&month={{now.month}}&day={{i|add:1}}&next={{ request.get_full_path| urlencode }}'>--</a></td>
+														{% else %}
+															<td>--</td>
+														{% endif %}
+												    
 
-											    	{% if mode == 'status' %}
-												    	<td class="text-center">
-											    			<a href='{% url "schedule:detail" user_working.pk %}?next={{ request.get_full_path| urlencode }}'>
-											    			<span class="{{user_working.get_status_style}}">{{user_working.workingcode.name}}</span>
-											    			</a>
-												    	</td>
-												    {% else %}
-												    	<td  {{user_working.get_working_style|safe}}> 
-												    		<a href='{% url "schedule:detail" user_working.pk %}?next={{ request.get_full_path| urlencode }}'>
-												    		{{user_working.workingcode.name}}
-												    		</a>
-												    	</td>
-											    	{% endif %}
 										    {% endif %}
-									<!-- Not in working list -->
-									{% else %}
-										    	<!-- Check permission request_working -->
-										    	{% if perms.schedule.add_working %}
-													<td class="text-center"><a href='{% url "schedule:add" section.name em.en %}?year={{now.year}}&month={{now.month}}&day={{i|add:1}}&next={{ request.get_full_path| urlencode }}'>--</a></td>
-												{% else %}
-													<td>--</td>
-												{% endif %}
-										    
 
-								    {% endif %}
+										{% endfor %}
 
-								{% endfor %}
-
-								
-							</tr>
-
+										
+									</tr>
+							{% endif %}
 
 
 

@@ -34,6 +34,7 @@ LCB1 & LCMT
 				<table border=1 width="1024">
 					<thead>
 						<tr>
+							<th class="text-center"></th>
 							<th class="text-center">Name</th>
 							<th class="text-center">En</th>
 			   				<th class="text-center">Working Date</th>
@@ -45,6 +46,7 @@ LCB1 & LCMT
 	 				<tbody>
 	 					{% for object in  object_list|dictsort:"user.en"|dictsort:"user.team" %}
 	 						<tr>
+	 							<td>{{ object.user.company }}</td>
 								<td>{{ object.user.first_name }} {{ object.user.last_name }}</td>
 								<td class="text-center">{{ object.user.en }}</td>
 				   				<td class="text-center">{{ object.working_date }}</td>
