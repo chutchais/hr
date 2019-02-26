@@ -134,6 +134,9 @@ LCB1 & LCMT
 
 
 				</h3> 
+
+				
+
 				<table border=1 width="1024">
 					<thead>
 					<tr>
@@ -141,12 +144,22 @@ LCB1 & LCMT
 						<th>Name</th>
 						<th>En</th>
 		   				{% for i in now|range_days %}
+		   					{% is_holiday now.year now.month i|add:1 as holiday %}
 						    <th class="text-center">
 						    	{% if perms.schedule.add_working %}
-						    			<a href="{% url 'schedule:section-daily' section.name now.year now.month i|add:1  %}">{{ forloop.counter }}</a>
+						    		{% if holiday %}
+										<span class="fa-stack fa-1x">
+										  <i class="fa fa-circle-o fa-stack-2x" style="color:blue"></i>
+										  <span  class="fa fa-stack-1x"><a href="{% url 'schedule:section-daily' section.name now.year now.month i|add:1  %}">{{ forloop.counter }}</a></span>
+										</span>
+									{% else %}
+										<a href="{% url 'schedule:section-daily' section.name now.year now.month i|add:1  %}">{{ forloop.counter }}</a>
+									{% endif %}
+						    			
 						    	{% else %}
 						    		{{ forloop.counter }}
 						    	{% endif %}
+
 						    </th>
 						{% endfor %}
 	 				</tr>

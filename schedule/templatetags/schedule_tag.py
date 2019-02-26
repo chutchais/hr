@@ -79,6 +79,16 @@ def previous_month(current):
 	dt3 = dt2.replace(day=1)
 	return dt3
 
+@register.simple_tag
+def is_holiday(year,month,day):
+	d = datetime.date(int(year),int(month),int(day))
+	day_str = d.strftime('%A')
+	if day_str in ['Saturday','Sunday']:
+		return True
+	return False
+
+	
+
 
 # @register.simple_tag
 # def get_working(working_list,user,year,month,day):
