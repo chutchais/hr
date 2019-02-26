@@ -230,6 +230,19 @@ LCB1 & LCMT
 					<a class="btn btn-success" role="button" href="{% url 'schedule:section-upload' section.name now.year now.month %}">Upload Working Data</a>
 				{% endif %}
 
+
+				{% if perms.schedule.complete_working or perms.schedule.accept %}
+			    	<br>
+					<h3>Download Working for TigerSoft</h3>
+					<a class="btn btn-warning" role="button" 
+						href="{% url 'schedule:section-download-csv' section.name now.year now.month 'LCB1' %}">LCB1</a>
+					<a class="btn btn-warning" role="button" 
+						href="{% url 'schedule:section-download-csv' section.name now.year now.month 'LCMT' %}">
+						LCMT</a>
+			    {% endif %}
+
+
+
 			{% endfor %} 
 	    </div>
   	</div>

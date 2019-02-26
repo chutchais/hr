@@ -18,6 +18,7 @@ from django.urls import reverse
 import xlrd
 import calendar
 import xlwt
+import csv
 
 
 from django.urls import reverse_lazy
@@ -713,3 +714,79 @@ def deleteWorking(request,section,year,month,day):
 	working = Working.objects.filter(user__section__name=section,working_date=working_date).delete()
 
 	return HttpResponseRedirect(url)
+
+
+def export_working_csv(request,company,section,year,month):
+
+	if year and month:
+		report_date 	= datetime.date(int(year),int(month),1)
+	else:
+		report_date 	= timezone.now()
+
+
+	objSection = Section.objects.get(name=section)
+	department = objSection.department.name
+
+
+	columns = [month]
+	number_of_day = calendar.monthrange(report_date.year,report_date.month)[1]
+	for i in range(1,number_of_day+1):
+		columns.append(i)
+
+	response = HttpResponse(content_type='text/csv')
+	response['Content-Disposition'] = 'attachment; filename="%s_%s_%s_%s.csv"' % (company,section,year,month)
+
+	writer = csv.writer(response)
+	writer.writerow([year])
+	writer.writerow(columns)
+
+	users = User.objects.filter(
+				company__name = company ,section__name = section).exclude(id=1).order_by('team','en')
+	for user in users:
+		# loop for working
+		# print(user)
+		rows = ["'%s" %(user.en[-4:])]
+		workings = Working.objects.filter(
+				user=user,working_date__year=year,working_date__month=month).order_by('working_date').values('workingcode__name')
+		previous_code =''
+		current_code = ''
+		for w in workings:
+			current_code = w['workingcode__name']
+			if current_code == 'OFF':
+				current_code = '*%s' % previous_code
+			rows.append(current_code)
+			previous_code = w['workingcode__name']
+
+		writer.writerow(rows)
+
+	return response
+
+
+	
+
+	# # Sheet body, remaining rows
+	# font_style = xlwt.XFStyle()
+	# i = 0
+	# ws.write(i, 0, 'year', font_style)
+	# ws.write(i, 1, report_date.year, font_style)
+	# ws.write(i+1, 0, 'Month', font_style)
+	# ws.write(i+1, 1, report_date.month, font_style)
+	# ws.write(i+2, 0, 'Department', font_style)
+	# ws.write(i+2, 1, department, font_style)
+	# ws.write(i+3, 0, 'Section', font_style)
+	# ws.write(i+3, 1, section, font_style)
+	# for col_num in range(len(columns)):
+	# 	ws.write(i+4, col_num, columns[col_num], font_style)
+
+
+	# row_num=4
+	# rows = User.objects.filter(section__name = section).exclude(id=1).order_by('team','en').values_list('first_name','last_name' ,'en')
+	# for row in rows:
+	# 	row_num += 1
+	# 	for col_num in range(len(row)):
+	# 		ws.write(row_num, col_num, row[col_num], font_style)
+
+	# response = HttpResponse(content_type='application/ms-excel')
+	# response['Content-Disposition'] = 'attachment; filename="%s_%s_working_%s.xls"' % (report_date.year,report_date.month,section)		
+	# wb.save(response)
+	# return response
