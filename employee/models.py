@@ -47,6 +47,7 @@ class User(AbstractUser):
 	description 		= models.TextField(null = True,blank = True)
 	manager 			= models.ForeignKey('self', blank = True,null=True, related_name='employees',
 								on_delete=models.SET_NULL)
+	team				= models.PositiveSmallIntegerField(default=100)
 
 	class Meta:
 		unique_together = (('en','company'))

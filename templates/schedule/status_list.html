@@ -24,6 +24,30 @@
   <div class="row">
       <div class="col">
       	<h1>Working schedule list of {{status}}</h1>
+
+
+
+      	{% if is_paginated %}
+		  {% if page_obj.has_previous %}
+		    <a href="?{% param_replace page=1 %}">First</a>
+		    {% if page_obj.previous_page_number != 1 %}
+		      <a href="?{% param_replace page=page_obj.previous_page_number %}">Previous</a>
+		    {% endif %}
+		  {% endif %}
+
+		  Page {{ page_obj.number }} of {{ paginator.num_pages }}
+
+		  {% if page_obj.has_next %}
+		    {% if page_obj.next_page_number != paginator.num_pages %}
+		      <a href="?{% param_replace page=page_obj.next_page_number %}">Next</a>
+		    {% endif %}
+		    <a href="?{% param_replace page=paginator.num_pages %}">Last</a>
+		  {% endif %}
+
+		  <p>Workings {{ page_obj.start_index }}—{{ page_obj.end_index }}</p>
+		{% endif %}
+
+
       	<table border=1 width="1024">
 					<thead>
 					<tr>
@@ -34,6 +58,7 @@
 						<th>Code</th>
 						<th>Status</th>
 						<th>Last update</th>
+						<th>Action</th>
 	 				</tr>
 	 				</thead>
 	 				<tbody>
@@ -53,6 +78,39 @@
 										<span class="{{object.get_status_style}}">{{object.status}}</span>
 									</td>
 									<td>{{object.modified_date}}</td>
+									<td class="text-center">
+										{% if object.status == 'DRAFT' or object.status == 'REJECT' %}
+			    						{% if perms.schedule.create_working %}
+			    							<a class="btn btn-info" role="button" href="{% url 'schedule:process' object.pk 'PRE_APPROVE' %}?next={{request.path|urlencode}}">Send to Pre-Approve</a>
+			    						{% endif %}
+			    					{% endif %}
+
+			    					{% if object.status == 'PRE_APPROVE' %}
+			    						{% if perms.schedule.pre_approve_working %}
+			    							<a class="btn btn-primary" role="button" href="{% url 'schedule:process' object.pk 'APPROVE' %}?next={{request.path|urlencode}}">Send to Approve</a>
+			    						{% endif %}
+			    					{% endif %}
+
+			    					{% if object.status == 'APPROVE' %}
+			    						{% if perms.schedule.approve_working %}
+			    							<a class="btn btn-warning" role="button" href="{% url 'schedule:process' object.pk 'ACKNOWLEDGE' %}?next={{request.path|urlencode}}">Send to Payroll Officer</a>
+			    						{% endif %}
+			    					{% endif %}
+
+			    					{% if object.status == 'ACKNOWLEDGE' %}
+			    						{% if perms.schedule.accept_reject_working %}
+				    						<a class="btn btn-success" role="button" href="{% url 'schedule:process' object.pk 'ACCEPT' %}?next={{request.path|urlencode}}">Accept</a>
+				    						<a class="btn btn-danger" role="button" href="{% url 'schedule:process' object.pk 'REJECT' %}?next={{request.path|urlencode}}">Reject</a>
+			    						{% endif %}
+			    					{% endif %}
+
+			    					{% if object.status == 'ACCEPT' %}
+			    						{% if perms.schedule.complete_working %}
+			    							<a class="btn btn-secondary" role="button" href="{% url 'schedule:process' object.pk 'COMPLETE' %}?next={{request.path|urlencode}}">Complete</a>
+			    						{% endif %}
+			    					{% endif %}
+
+									</td>
 				 				</tr>
 	 					{% endfor %}
 	 				</tbody>

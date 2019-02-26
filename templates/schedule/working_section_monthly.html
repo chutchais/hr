@@ -1,0 +1,237 @@
+{% extends "base.html" %}
+{% load schedule_tag %}
+
+{% block title %}
+LCB1 & LCMT 
+{% endblock %}
+
+
+   {% block stylesheet %}
+   <style type="text/css">
+   table {
+    max-width: 100%;
+	}
+
+    th {
+    background-color: #C0DAFF;
+    color: black;
+	}
+	</style>
+    {% endblock stylesheet %}
+
+
+{% block content %}
+<div class="container">
+
+	{% next_month now as on_next_month %}
+	{% previous_month now as on_previous_month %}
+
+	<h1>Work schedule on {{now|date:"F Y"}}   
+
+		{% if mode == 'status' %}
+
+			{% if department %}
+				<a href="{% url 'schedule:section-monthly' section now.year now.month %}"><i class="fa fa-retweet" style="font-size:24px;color:blue"></i></small></a>
+			{%else%}
+				<a href="{% url 'schedule:section-monthly' section now.year now.month %}"><i class="fa fa-retweet" style="font-size:24px;color:blue"></i></a>
+			{% endif %}
+			
+		{% else %}
+			<!-- <a href="{% url 'schedule:list' %}?{{ request.GET.urlencode }}&mode=status"><small><small><small>status mode</small></small></small></a> -->
+
+			<a href="?{% query_transform request mode='status' %}"><i class="fa fa-retweet" style="font-size:24px;color:red"></i></a>
+			
+		{% endif %}
+	</h1>
+
+		
+
+		<a href="{% url 'schedule:section-list' %}"><i class="fa fa fa-bars" style="font-size:24px;color:blue"></i></a>  
+		<a href="{% url 'schedule:section-monthly' section on_previous_month.year on_previous_month.month %}"><small>{{on_previous_month|date:"F Y"}}</small></a> | 
+		{% if department %}
+			<a href="{% url 'schedule:section-detail' section %}"><small>Current Month</small></a>
+		{% else %}
+			<a href="{% url 'schedule:section-detail' section %}"><small>Current Month</small></a>
+		{% endif %}
+		 | 
+		<a href="{% url 'schedule:section-monthly' section on_next_month.year on_next_month.month %}"><small>{{on_next_month|date:"F Y"}}</small></a>
+    
+    <div class="row">
+	    <div class="col">
+	      {% for section in section_list %}
+	      
+
+
+	      		{% status_in_working working_list section as status_list %}
+
+
+				<h3>
+					{{section}} 
+
+					{% for s in status_list %}
+						{% if s.status__count > 0 %}
+							
+							
+								  {% if s.status == 'DRAFT' %}
+								  	<a href="{% url 'schedule:section-status' section.name 'DRAFT' %}">
+										<button type="button" class="btn btn-light">
+										  Draft <span class="badge badge-light">{{s.status__count}}</span>
+										</button>
+									</a>
+								  {% endif %}
+								  {% if s.status == 'PRE_APPROVE' %}
+								  	<a href="{% url 'schedule:section-status' section.name 'PRE_APPROVE' %}">
+										<button type="button" class="btn btn-info">
+										  Pre-Approve <span class="badge badge-light">{{s.status__count}}</span>
+										</button>
+									</a>
+								  {% endif %}
+								  {% if s.status == 'APPROVE' %}
+								  	<a href="{% url 'schedule:section-status' section.name 'APPROVE' %}">
+										<button type="button" class="btn btn-primary">
+										  Approve <span class="badge badge-light">{{s.status__count}}</span>
+										</button>
+									</a>
+								  {% endif %}
+
+								  {% if s.status == 'ACKNOWLEDGE' %}
+								  	<a href="{% url 'schedule:section-status' section.name 'ACKNOWLEDGE' %}">
+										<button type="button" class="btn btn-warning">
+										  Acknowledge <span class="badge badge-light">{{s.status__count}}</span>
+										</button>
+									</a>
+								  {% endif %}
+
+								  {% if s.status == 'ACCEPT' %}
+								  	<a href="{% url 'schedule:section-status' section.name 'ACCEPT' %}">
+										<button type="button" class="btn btn-success">
+										  Accept <span class="badge badge-light">{{s.status__count}}</span>
+										</button>
+									</a>
+								  {% endif %}
+
+								  {% if s.status == 'REJECT' %}
+								  	<a href="{% url 'schedule:section-status' section.name 'REJECT' %}">
+										<button type="button" class="btn btn-success">
+										  Reject <span class="badge badge-danger">{{s.status__count}}</span>
+										</button>
+									</a>
+								  {% endif %}
+
+								  {% if s.status == 'COMPLETE' %}
+								  	<a href="{% url 'schedule:section-status' section.name 'COMPLETE' %}">
+										<button type="button" class="btn btn-secondary">
+										  Completed <span class="badge badge-danger">{{s.status__count}}</span>
+										</button>
+									</a>
+								  {% endif %}
+
+						{% endif %}
+					{% endfor %}
+					
+
+					
+
+
+				</h3> 
+				<table border=1 width="1024">
+					<thead>
+					<tr>
+						<th>Name</th>
+						<th>En</th>
+		   				{% for i in now|range_days %}
+						    <th class="text-center">
+						    	{% if perms.schedule.add_working %}
+						    			<a href="{% url 'schedule:section-daily' section.name now.year now.month i|add:1  %}">{{ forloop.counter }}</a>
+						    	{% else %}
+						    		{{ forloop.counter }}
+						    	{% endif %}
+						    </th>
+						{% endfor %}
+	 				</tr>
+	 				</thead>
+	 				<tbody>
+					
+						{% for em in section.employees.all|dictsort:"en"|dictsort:"team" %}
+							<!-- CHeck existing in working, if No create all date -->
+							{% get_working_by_month em.pk now.year now.month as list_working_date %}
+
+							
+
+							
+
+							<tr>
+								<td>{{em}}</td>
+								<td><a href="{% url 'employee:employee-detail' em.pk %}">{{em.en|slice:"-4:"}}</a></td>
+								
+								
+								{% for i in now|range_days %}
+									<!-- Loop in working list -->
+									<!-- Check in working list first -->
+									{% if i|add:1 in list_working_date %}
+
+											{% get_working em now.year now.month i|add:1 as user_working %}
+
+										    {% if user_working %}
+										    	
+
+											    	{% if mode == 'status' %}
+												    	<td class="text-center">
+											    			<a href='{% url "schedule:detail" user_working.pk %}?next={{ request.get_full_path| urlencode }}'>
+											    			<span class="{{user_working.get_status_style}}">{{user_working.workingcode.name}}</span>
+											    			</a>
+												    	</td>
+												    {% else %}
+												    	<td  {{user_working.get_working_style|safe}}> 
+												    		<a href='{% url "schedule:detail" user_working.pk %}?next={{ request.get_full_path| urlencode }}'>
+												    		{{user_working.workingcode.name}}
+												    		</a>
+												    	</td>
+											    	{% endif %}
+										    {% endif %}
+									<!-- Not in working list -->
+									{% else %}
+										    	<!-- Check permission request_working -->
+										    	{% if perms.schedule.add_working %}
+													<td class="text-center"><a href='{% url "schedule:add" section.name em.en %}?year={{now.year}}&month={{now.month}}&day={{i|add:1}}&next={{ request.get_full_path| urlencode }}'>--</a></td>
+												{% else %}
+													<td>--</td>
+												{% endif %}
+										    
+
+								    {% endif %}
+
+								{% endfor %}
+
+								
+							</tr>
+
+
+
+
+						{% endfor %}
+					</tbody>
+				</table>
+				<!-- Show Working Code -->
+				<table>
+
+				{% for working in section.workingcodes.all|dictsort:"name" %}
+					<tr>
+						<td {{working.get_color_style|safe}}>{{working.name}}</td> <td>({{working.start_time}} to {{working.end_time}}) </td>
+					</tr>
+				{% endfor %}
+				</table>
+
+				{% if perms.schedule.add_working %}
+					<br>
+					<h3>Download/Upload Working information</h3>
+					<a class="btn btn-info" role="button" href="{% url 'schedule:section-download' section.name now.year now.month %}?{% query_transform request %}">Download Working Template</a>
+					<a class="btn btn-success" role="button" href="{% url 'schedule:section-upload' section.name now.year now.month %}">Upload Working Data</a>
+				{% endif %}
+
+			{% endfor %} 
+	    </div>
+  	</div>
+
+</div>
+{% endblock content %}

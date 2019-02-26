@@ -71,14 +71,14 @@ class MyUserAdmin(UserAdmin):
 	form 		= MyUserChangeForm
 	add_form 	= MyUserCreationForm
 	list_filter = ('company','section__department', 'section','position')
-	list_display = ('username','first_name','last_name','en','position', 'section','company','is_staff')
+	list_display = ('username','first_name','last_name','en','position', 'section','company','team','is_staff')
 	ordering = ['en','first_name']
 	search_fields = ['username','first_name','last_name','en','email']
 	set_unusable_password = None
 
 	fieldsets 	= (
 		('Personal info', {'fields': ('username','password',('title','first_name','last_name'),'en', 'email')}),
-		('Department info', {'fields': ('company','section',('position'),'description')}),
+		('Department info', {'fields': ('company','section','team',('position'),'description')}),
 		('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser',
 									   'groups', 'user_permissions',)}),
 		('Important dates', {'fields': ('last_login', 'date_joined',)})
@@ -92,7 +92,7 @@ class MyUserAdmin(UserAdmin):
 		}),
 		('Organize info', {
 			'classes': ('wide',),
-			'fields': ('company','section','position' ),
+			'fields': ('company','section','team','position' ),
 		})
 	)
 

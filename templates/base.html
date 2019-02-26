@@ -24,6 +24,9 @@
                         <!-- Add this to <head> -->
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css" integrity="sha384-Smlep5jCw/wG7hdkwQ/Z5nLIefveQRIY9nfy6xoR1uRYBtpZgI6339F5dgvm/e9B" crossorigin="anonymous">
 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+
 
 
   </head>
@@ -48,21 +51,22 @@
 
 
 
-<nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
+<!-- <nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
       <a class="navbar-brand" href="">HR - Overtime Management</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
-
-      <!-- <a class="navbar-brand" href="">Welcome {{user}}</a> -->
-
       <div class="collapse navbar-collapse" id="navbarCollapse">
         <ul class="navbar-nav mr-auto">
           <li class="nav-item active">
             <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
           </li>
-      </div>
 
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'schedule:section-list'%}">Working schedule <span class="sr-only">(current)</span></a>
+          </li>
+        </ul>
+      </div>
       <div class="navbar-collapse collapse w-100 order-3 dual-collapse2">
         <ul class="navbar-nav ml-auto">
           {% if user.is_authenticated %}
@@ -79,8 +83,45 @@
             {% endif %}
         </ul>
     </div>
-    </nav>
+    </nav> -->
 
+<nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
+  <!-- <a class="navbar-brand" href="#">HR - Overtime</a> -->
+  <a class="navbar-brand" href="#">
+    <i class="fa fa-id-card-o" style="font-size:30px;color:blue"></i>
+    HR - Overtime Approval System
+  </a>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+    <div class="navbar-nav">
+      <a class="nav-item nav-link active" href="/">Home <span class="sr-only">(current)</span></a>
+      <a class="nav-item nav-link" href="{% url 'schedule:section-list'%}">Schedule</a>
+      <a class="nav-item nav-link disabled" href="">Overtime</a>
+      <a class="nav-item nav-link disabled" href="">Leave</a>
+    </div>
+  </div>
+
+  <div class="navbar-collapse collapse w-100 order-3 dual-collapse2">
+        <ul class="navbar-nav ml-auto">
+          {% if user.is_authenticated %}
+            <li class="nav-item active">
+                <a class="nav-link" href="#">Welcome {{user}} ({{user.section.department}})</a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="/logout">Logout <span class="sr-only">(current)</span></a>
+            </li>
+            {%else%}
+              <li class="nav-item active">
+                <a class="nav-link" href="/login">Login <span class="sr-only">(current)</span></a>
+            </li>
+            {% endif %}
+        </ul>
+    </div>
+
+</nav>
 
     {% block head %}
     {% endblock head %}

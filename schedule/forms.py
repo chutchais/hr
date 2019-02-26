@@ -23,3 +23,7 @@ class WorkingForm(ModelForm):
 	def clean(self):
 		# workingcode = self.cleaned_data.pop('workingcode')
 		print('clean')
+
+class UploadFileForm(forms.Form):
+	# filetype = forms.ModelChoiceField(queryset= FileType.objects.filter(status='A'), empty_label="(Please select File Type)")
+	file = forms.FileField()

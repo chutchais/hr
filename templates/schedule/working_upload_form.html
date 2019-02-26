@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% load schedule_tag %}
+
+{% block title %}
+Upload working
+{% endblock %}
+
+
+
+
+{% block content %}
+
+	<div class="container">
+		<h1>{{title}} on {{now|date:"F Y"}}
+			
+		</h1>
+
+		<div class="row">
+	    	<div class="col">
+
+			 <form action="" enctype="multipart/form-data"  method="post">
+			        <table>
+			            {{ form.as_table }}
+			        </table>
+			        {% csrf_token %}
+			        <br>
+			        <input type="submit" value="Upload and Verify">
+			    </form>
+			    <br>
+			    <a href="{% url 'schedule:section-detail' section %}">Back</a>
+			</div>
+
+
+
+			<!-- {% if working_list %}
+
+
+			<table border=1 width="1024">
+					<thead>
+					<tr>
+						<th>Name</th>
+						<th>En</th>
+		   				{% for i in now|range_days %}
+						    <th class="text-center">{{ forloop.counter }}</th>
+						{% endfor %}
+	 				</tr>
+	 				</thead>
+	 				<tbody>
+						{% for em in section.employees.all|dictsort:"en" %}
+							<tr>
+								<td>{{em}}</td>
+								<td>{{em.en|slice:"-4:"}}</td>
+							
+
+								{% for i in now|range_days %}
+						    	
+											<td>--</td>						 
+								{% endfor %}
+								</tr>
+						{% endfor %}
+					</tbody>
+	 		</table>
+	 	</div>
+	 </div>
+	 		
+	 	<div class="row">
+	    	<div class="col">
+	 			
+				<form method="POST" action="confirm">
+			      <input type="hidden" name="rows" value="{{ working_list }}">
+			      {% csrf_token %}
+			      <input type="submit" value="Confirm">
+			    </form>
+
+			</div>
+		</div>	
+			{% endif %} -->
+
+</div>	
+	
+
+{% endblock content %}

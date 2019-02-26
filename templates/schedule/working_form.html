@@ -25,7 +25,7 @@ Create working
 			        {% if object %}
 			        	{% if object.status == 'DRAFT' or object.status == 'REJECT' %}
 			        		{% if perms.schedule.delete_working %}
-			    				<a class="btn btn-danger" role="button" href="{% url 'schedule:delete' object.pk %}">Delete</a>
+			    				<a class="btn btn-danger" role="button" href="{% url 'schedule:delete' object.pk %}?next={{ next| urlencode }}">Delete</a>
 			    			{% else %}
 			    				No permission to delete
 			    			{% endif %}

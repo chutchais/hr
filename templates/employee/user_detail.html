@@ -40,14 +40,16 @@ Employee Detail
 
             </h1>
 
+              {% status_in_working object.workings.all object.section as status_list %}
+
               <!-- Show Status  -->
-              {% working_in_sction working_list object.section 'DRAFT' as status_draft %}
-              {% working_in_sction working_list object.section 'PRE_APPROVE' as status_pre_approve %}
-              {% working_in_sction working_list object.section 'APPROVE' as status_approve %}
-              {% working_in_sction working_list object.section 'ACCEPT' as status_accept %}
-              {% working_in_sction working_list object.section 'REJECT' as status_reject %}
-              {% working_in_sction working_list object.section 'COMPLETE' as status_complete %}
-              {% working_in_sction working_list object.section 'ACKNOWLEDGE' as status_acknowledge %}
+              {% working_in_sction object.workings.all object.section 'DRAFT' as status_draft %}
+              {% working_in_sction object.workings.all object.section 'PRE_APPROVE' as status_pre_approve %}
+              {% working_in_sction object.workings.all object.section 'APPROVE' as status_approve %}
+              {% working_in_sction object.workings.all object.section 'ACCEPT' as status_accept %}
+              {% working_in_sction object.workings.all object.section 'REJECT' as status_reject %}
+              {% working_in_sction object.workings.all object.section 'COMPLETE' as status_complete %}
+              {% working_in_sction object.workings.all object.section 'ACKNOWLEDGE' as status_acknowledge %}
 
               {% if status_draft > 0 %}
             <button type="button" class="btn btn-light">
@@ -110,12 +112,12 @@ Employee Detail
                       <tr>
                         <td>{{start_month|date:"Y"}}</td>
                         <td>
-                            <a href="{% url 'schedule:department-list' object.section.department %}?year={{start_month.year}}&month={{start_month.month}}">
+                            <a href="{% url 'schedule:section-monthly' object.section.name start_month.year start_month.month %}">
                             {{start_month|date:"F"}}
                         </td>
-                         {% for x in x|rjust:31 %}
-                         {% get_working working_list object start_month.year start_month.month forloop.counter as user_working %}
-                         
+                         {% for y in start_month|range_days %}
+                                {% get_working object start_month.year start_month.month y|add:1 as user_working %}
+
                               {% if user_working %}
                       
                                   {% if mode == 'status' %}

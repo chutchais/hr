@@ -31,15 +31,15 @@ LCB1 & LCMT
 		{% if mode == 'status' %}
 
 			{% if department %}
-				<a href="{% url 'schedule:department-list' department %}"><small><small><small>working code mode</small></small></small></a>
+				<a href="{% url 'schedule:department-monthly' section now.year now.month %}"><i class="fa fa-retweet" style="font-size:24px;color:blue"></i></small></a>
 			{%else%}
-				<a href="{% url 'schedule:list' %}"><small><small><small>working code mode</small></small></small></a>
+				<a href="{% url 'schedule:section-monthly' section now.year now.month %}"><i class="fa fa-retweet" style="font-size:24px;color:blue"></i></a>
 			{% endif %}
 			
 		{% else %}
 			<!-- <a href="{% url 'schedule:list' %}?{{ request.GET.urlencode }}&mode=status"><small><small><small>status mode</small></small></small></a> -->
 
-			<a href="?{% query_transform request mode='status' %}"><small><small><small>status mode</small></small></small></a>
+			<a href="?{% query_transform request mode='status' %}"><i class="fa fa-retweet" style="font-size:24px;color:red"></i></a>
 			
 		{% endif %}
 	</h1>
@@ -52,11 +52,12 @@ LCB1 & LCMT
 			<br>
 		{% endif %}
 
+		<a href="{% url 'schedule:section-list' %}"><i class="fa fa fa-bars" style="font-size:24px;color:blue"></i></a>  
 		<a href="?year={{on_previous_month.year}}&month={{on_previous_month.month}}"><small>{{on_previous_month|date:"F Y"}}</small></a> | 
 		{% if department %}
-			<a href="{% url 'schedule:department-list' department %}"><small>Current Month</small></a>
+			<a href="{% url 'schedule:section-detail' section %}"><small>Current Month</small></a>
 		{% else %}
-			<a href="{% url 'schedule:list' %}"><small>Current Month</small></a>
+			<a href="{% url 'schedule:section-detail' section %}"><small>Current Month</small></a>
 		{% endif %}
 		 | 
 		<a href="?year={{on_next_month.year}}&month={{on_next_month.month}}"><small>{{on_next_month|date:"F Y"}}</small></a>
@@ -75,11 +76,62 @@ LCB1 & LCMT
 
 					{% for s in status_list %}
 						{% if s.status__count > 0 %}
-							<a href="{% url 'schedule:status-list' s.status %}">
-								<button type="button" class="btn btn-light">
-								  {{s.status}} <span class="badge badge-light">{{s.status__count}}</span>
-								</button>
-							</a>
+							
+							
+								  {% if s.status == 'DRAFT' %}
+								  	<a href="{% url 'schedule:status-list' 'DRAFT' %}">
+										<button type="button" class="btn btn-light">
+										  Draft <span class="badge badge-light">{{s.status__count}}</span>
+										</button>
+									</a>
+								  {% endif %}
+								  {% if s.status == 'PRE_APPROVE' %}
+								  	<a href="{% url 'schedule:status-list' 'PRE_APPROVE' %}">
+										<button type="button" class="btn btn-info">
+										  Pre-Approve <span class="badge badge-light">{{s.status__count}}</span>
+										</button>
+									</a>
+								  {% endif %}
+								  {% if s.status == 'APPROVE' %}
+								  	<a href="{% url 'schedule:status-list' 'APPROVE' %}">
+										<button type="button" class="btn btn-primary">
+										  Approve <span class="badge badge-light">{{s.status__count}}</span>
+										</button>
+									</a>
+								  {% endif %}
+
+								  {% if s.status == 'ACKNOWLEDGE' %}
+								  	<a href="{% url 'schedule:status-list' 'ACKNOWLEDGE' %}">
+										<button type="button" class="btn btn-warning">
+										  Acknowledge <span class="badge badge-light">{{s.status__count}}</span>
+										</button>
+									</a>
+								  {% endif %}
+
+								  {% if s.status == 'ACCEPT' %}
+								  	<a href="{% url 'schedule:status-list' 'ACCEPT' %}">
+										<button type="button" class="btn btn-success">
+										  Accept <span class="badge badge-light">{{s.status__count}}</span>
+										</button>
+									</a>
+								  {% endif %}
+
+								  {% if s.status == 'REJECT' %}
+								  	<a href="{% url 'schedule:status-list' 'REJECT' %}">
+										<button type="button" class="btn btn-success">
+										  Reject <span class="badge badge-danger">{{s.status__count}}</span>
+										</button>
+									</a>
+								  {% endif %}
+
+								  {% if s.status == 'COMPLETE' %}
+								  	<a href="{% url 'schedule:status-list' 'COMPLETE' %}">
+										<button type="button" class="btn btn-secondary">
+										  Completed <span class="badge badge-danger">{{s.status__count}}</span>
+										</button>
+									</a>
+								  {% endif %}
+
 						{% endif %}
 					{% endfor %}
 					
@@ -94,13 +146,19 @@ LCB1 & LCMT
 						<th>Name</th>
 						<th>En</th>
 		   				{% for i in now|range_days %}
-						    <th class="text-center">{{ forloop.counter }}</th>
+						    <th class="text-center">
+						    	{% if perms.schedule.add_working %}
+						    			<a href="{% url 'schedule:section-daily' section.name now.year now.month i|add:1  %}">{{ forloop.counter }}</a>
+						    	{% else %}
+						    		{{ forloop.counter }}
+						    	{% endif %}
+						    </th>
 						{% endfor %}
 	 				</tr>
 	 				</thead>
 	 				<tbody>
 					
-						{% for em in section.employees.all|dictsort:"en" %}
+						{% for em in section.employees.all|dictsort:"team" %}
 							<!-- CHeck existing in working, if No create all date -->
 							{% get_working_by_month em.pk now.year now.month as list_working_date %}
 
@@ -163,13 +221,21 @@ LCB1 & LCMT
 				<!-- Show Working Code -->
 				<table>
 
-				{% for working in section.workingcodes.all.iterator %}
+				{% for working in section.workingcodes.all|dictsort:"name" %}
 					<tr>
 						<td {{working.get_color_style|safe}}>{{working.name}}</td> <td>({{working.start_time}} to {{working.end_time}}) </td>
 					</tr>
 				{% endfor %}
 				</table>
-			{% endfor %}
+
+				{% if perms.schedule.add_working %}
+				<br>
+				<h3>Download/Upload Working information</h3>
+				<a class="btn btn-info" role="button" href="{% url 'schedule:section-download' section.name %}?{% query_transform request %}">Download Working Template</a>
+				<a class="btn btn-success" role="button" href="{% url 'schedule:section-upload' section.name %}">Upload Working Data</a>
+				{% endif %}
+
+			{% endfor %} 
 	    </div>
   	</div>
 

@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% load schedule_tag %}
+
+{% block title %}
+LCB1 & LCMT 
+{% endblock %}
+
+
+   {% block stylesheet %}
+   <style type="text/css">
+   table {
+    max-width: 100%;
+	}
+
+    th {
+    background-color: #C0DAFF;
+    color: black;
+	}
+	</style>
+    {% endblock stylesheet %}
+
+
+{% block content %}
+<div class="container">
+	<div class="row">
+	    <div class="col">
+				<h3>Working Daily detail : {{ section }} <a href="{% url 'schedule:section-monthly' section working_date.year working_date.month %}"><i class="fa fa-mail-reply" style="font-size:24px;color:blue"></i></a> </h3>
+				<br>
+				{% if perms.schedule.create_working %}
+					<a class="btn btn-danger" role="button" href="{% url 'schedule:section-daily-delete' section working_date.year working_date.month working_date.day %}?next={% url 'schedule:section-monthly' section working_date.year working_date.month %}">Delete Working</a>
+					Only DRAFT,PRE-APPROVE and APPROVE status
+			    {% endif %}
+				<br>
+				<table border=1 width="1024">
+					<thead>
+						<tr>
+							<th class="text-center">Name</th>
+							<th class="text-center">En</th>
+			   				<th class="text-center">Working Date</th>
+			   				<th class="text-center">Code</th>
+			   				<th class="text-center">Status</th>
+			   				<th class="text-center">Action</th>
+		 				</tr>
+	 				</thead>
+	 				<tbody>
+	 					{% for object in  object_list|dictsort:"user.en"|dictsort:"user.team" %}
+	 						<tr>
+								<td>{{ object.user.first_name }} {{ object.user.last_name }}</td>
+								<td class="text-center">{{ object.user.en }}</td>
+				   				<td class="text-center">{{ object.working_date }}</td>
+				   				<td {{object.get_working_style|safe}}>{{ object.workingcode.name }}</td>
+				   				<td class="text-center"><span class="{{object.get_status_style}}">{{ object.status }}</span></td>
+				   				<td class="text-center">
+				   					{% if object.status == 'DRAFT' or object.status == 'REJECT' %}
+			    						{% if perms.schedule.create_working %}
+			    							<a class="btn btn-info" role="button" href="{% url 'schedule:process' object.pk 'PRE_APPROVE' %}?next={{next|urlencode}}">Send to Pre-Approve</a>
+			    						{% endif %}
+			    					{% endif %}
+
+			    					{% if object.status == 'PRE_APPROVE' %}
+			    						{% if perms.schedule.pre_approve_working %}
+			    							<a class="btn btn-primary" role="button" href="{% url 'schedule:process' object.pk 'APPROVE' %}?next={{next|urlencode}}">Send to Approve</a>
+			    						{% endif %}
+			    					{% endif %}
+
+			    					{% if object.status == 'APPROVE' %}
+			    						{% if perms.schedule.approve_working %}
+			    							<a class="btn btn-warning" role="button" href="{% url 'schedule:process' object.pk 'ACKNOWLEDGE' %}?next={{next|urlencode}}">Send to Payroll Officer</a>
+			    						{% endif %}
+			    					{% endif %}
+
+			    					{% if object.status == 'ACKNOWLEDGE' %}
+			    						{% if perms.schedule.accept_reject_working %}
+				    						<a class="btn btn-success" role="button" href="{% url 'schedule:process' object.pk 'ACCEPT' %}?next={{next}}">Accept</a>
+				    						<a class="btn btn-danger" role="button" href="{% url 'schedule:process' object.pk 'REJECT' %}?next={{next|urlencode}}">Reject</a>
+			    						{% endif %}
+			    					{% endif %}
+
+			    					{% if object.status == 'ACCEPT' %}
+			    						{% if perms.schedule.complete_working %}
+			    							<a class="btn btn-secondary" role="button" href="{% url 'schedule:process' object.pk 'COMPLETE' %}?next={{next|urlencode}}">Complete</a>
+			    						{% endif %}
+			    					{% endif %}
+
+				   					
+				   				</td>
+		 					</tr>
+	 					{% endfor %}
+	 				</tbody>
+	 			</table>
+
+		</div>
+	</div>
+</div>
+{% endblock content %}

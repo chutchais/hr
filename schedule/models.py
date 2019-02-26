@@ -99,6 +99,7 @@ class Working(models.Model):
 			("accept_reject_working", "Can accept/reject working schedule"),
 			("complete_working", "Can complete working schedule"),
 		)
+		unique_together = (('user','working_date'))
 
 	def clean(self):
 		# print ("On clean function..%s - %s" % (self.user.section,self.workingcode.section))
