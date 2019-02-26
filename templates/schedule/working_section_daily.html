@@ -25,12 +25,66 @@ LCB1 & LCMT
 	<div class="row">
 	    <div class="col">
 				<h3>Working Daily detail : {{ section }} <a href="{% url 'schedule:section-monthly' section working_date.year working_date.month %}"><i class="fa fa-mail-reply" style="font-size:24px;color:blue"></i></a> </h3>
-				<br>
-				{% if perms.schedule.create_working %}
-					<a class="btn btn-danger" role="button" href="{% url 'schedule:section-daily-delete' section working_date.year working_date.month working_date.day %}?next={% url 'schedule:section-monthly' section working_date.year working_date.month %}">Delete Working</a>
-					Only DRAFT,PRE-APPROVE and APPROVE status
-			    {% endif %}
-				<br>
+				
+				
+				
+
+				{% status_in_working object_list section as status_list %}
+					<br>
+					Multiple action :
+					{% for s in status_list %}
+						{% if s.status__count > 0 %}
+									
+								{% if s.status == 'DRAFT' or s.status == 'REJECT' %}
+			    						{% if perms.schedule.create_working %}
+			    							<a class="btn btn-info" role="button" href="{% url 'schedule:section-daily-action' section working_date.year working_date.month working_date.day 'PRE_APPROVE' %}?next={% url 'schedule:section-daily' section working_date.year working_date.month working_date.day %}">Send to Pre-Approve
+			    								<span class="badge badge-light">{{s.status__count}}</span>
+			    							</a>
+			    						{% endif %}
+			    				{% endif %}
+
+			    				{% if s.status == 'PRE_APPROVE' %}
+			    						{% if perms.schedule.pre_approve_working %}
+			    							<a class="btn btn-primary" role="button" href="{% url 'schedule:section-daily-action' section working_date.year working_date.month working_date.day 'APPROVE' %}?next={% url 'schedule:section-daily' section working_date.year working_date.month working_date.day %}">Send to Approve
+			    							<span class="badge badge-light">{{s.status__count}}</span>
+			    							</a>
+			    						{% endif %}
+			    					{% endif %}
+
+			    					{% if s.status == 'APPROVE' %}
+			    						{% if perms.schedule.approve_working %}
+			    							<a class="btn btn-warning" role="button" href="{% url 'schedule:section-daily-action' section working_date.year working_date.month working_date.day 'ACKNOWLEDGE' %}?next={% url 'schedule:section-daily' section working_date.year working_date.month working_date.day %}">Send to Payroll Officer
+			    								<span class="badge badge-light">{{s.status__count}}</span>
+			    							</a>
+			    						{% endif %}
+			    					{% endif %}
+
+			    					{% if s.status == 'ACKNOWLEDGE' %}
+			    						{% if perms.schedule.accept_reject_working %}
+				    						<a class="btn btn-success" role="button" href="{% url 'schedule:section-daily-action' section working_date.year working_date.month working_date.day 'ACCEPT' %}?next={% url 'schedule:section-daily' section working_date.year working_date.month working_date.day %}">Accept
+				    							<span class="badge badge-light">{{s.status__count}}</span>
+				    						</a>
+				    						<a class="btn btn-danger" role="button" href="{% url 'schedule:section-daily-action' section working_date.year working_date.month working_date.day 'REJECT' %}?next={% url 'schedule:section-daily' section working_date.year working_date.month working_date.day %}">Reject
+				    							<span class="badge badge-light">{{s.status__count}}</span>
+				    						</a>
+			    						{% endif %}
+			    					{% endif %}
+
+			    					{% if s.status == 'ACCEPT' %}
+			    						{% if perms.schedule.complete_working %}
+			    							<a class="btn btn-secondary" role="button" href="{% url 'schedule:section-daily-action' section working_date.year working_date.month working_date.day 'COMPLETE' %}?next={% url 'schedule:section-daily' section working_date.year working_date.month working_date.day %}">Complete
+			    								<span class="badge badge-light">{{s.status__count}}</span>
+			    								</a>
+			    						{% endif %}
+			    					{% endif %}
+								
+
+								  
+								 
+
+						{% endif %}
+					{% endfor %}
+
 				<table border=1 width="1024">
 					<thead>
 						<tr>
@@ -90,7 +144,11 @@ LCB1 & LCMT
 	 					{% endfor %}
 	 				</tbody>
 	 			</table>
-
+	 			{% if perms.schedule.create_working %}
+					<br>
+					<a class="btn btn-danger" role="button" href="{% url 'schedule:section-daily-delete' section working_date.year working_date.month working_date.day %}?next={% url 'schedule:section-monthly' section working_date.year working_date.month %}">Delete all Working</a>
+					Only DRAFT,PRE-APPROVE and APPROVE status
+			    {% endif %}
 		</div>
 	</div>
 </div>

@@ -112,8 +112,8 @@ LCB1 & LCMT
 
 								  {% if s.status == 'REJECT' %}
 								  	<a href="{% url 'schedule:section-status' section.name 'REJECT' %}">
-										<button type="button" class="btn btn-success">
-										  Reject <span class="badge badge-danger">{{s.status__count}}</span>
+										<button type="button" class="btn btn-danger">
+										  Reject <span class="badge badge-light">{{s.status__count}}</span>
 										</button>
 									</a>
 								  {% endif %}
@@ -121,7 +121,7 @@ LCB1 & LCMT
 								  {% if s.status == 'COMPLETE' %}
 								  	<a href="{% url 'schedule:section-status' section.name 'COMPLETE' %}">
 										<button type="button" class="btn btn-secondary">
-										  Completed <span class="badge badge-danger">{{s.status__count}}</span>
+										  Completed <span class="badge badge-light">{{s.status__count}}</span>
 										</button>
 									</a>
 								  {% endif %}

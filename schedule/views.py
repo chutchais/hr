@@ -715,6 +715,42 @@ def deleteWorking(request,section,year,month,day):
 
 	return HttpResponseRedirect(url)
 
+def actionWorking(request,section,year,month,day,action):
+	if not request.user.is_authenticated:
+		return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+	
+	url = request.GET.get('next')
+
+	# Process ,move to next process
+	working_date = datetime.date(int(year),int(month),int(day))
+	# action means next status
+	if action=='PRE_APPROVE':
+		status = ['DRAFT','REJECT']
+	if action=='APPROVE':
+		status= ['PRE_APPROVE']
+	if action=='ACKNOWLEDGE':
+		status= ['APPROVE']
+	if action=='ACCEPT':
+		status= ['ACKNOWLEDGE']
+	if action=='REJECT':
+		status= ['ACKNOWLEDGE']
+	if action=='COMPLETE':
+		status= ['ACCEPT']
+
+
+
+	workings = Working.objects.filter(user__section__name=section,
+									working_date=working_date,
+									status__in=status)
+	for w in workings:
+		w.status = action
+		w.save()
+		w.logs.create(note= ('[ work code : %s] %s ' %(w.workingcode.name,'process')) ,
+							user=request.user,log_type=action)
+
+
+	return HttpResponseRedirect(url)
+
 
 def export_working_csv(request,company,section,year,month):
 
@@ -745,7 +781,7 @@ def export_working_csv(request,company,section,year,month):
 	for user in users:
 		# loop for working
 		# print(user)
-		rows = ["'%s" %(user.en[-4:])]
+		rows = ["%s" %(user.en[-4:])]
 		workings = Working.objects.filter(
 				user=user,working_date__year=year,working_date__month=month).order_by('working_date').values('workingcode__name')
 		previous_code =''

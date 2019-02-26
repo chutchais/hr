@@ -6,7 +6,8 @@ from . import views
 from .views import (WorkingListView,WorkingSectionListView,WorkingCreate,WorkingUpdate,WorkingDelete,
 					WorkingStatusListView,ProcessWorking,import_working_data,confirm_working,
                     WorkingSectionListView,WorkingSectionDetailView,export_working_xls,
-                    WorkingSectionMonthlyView,WorkingSectionDailyListView,deleteWorking,export_working_csv)
+                    WorkingSectionMonthlyView,WorkingSectionDailyListView,deleteWorking,export_working_csv,
+                    actionWorking)
 
 urlpatterns = [
     # url(r'^$', WorkingListView.as_view(), name='list'),
@@ -29,6 +30,7 @@ urlpatterns = [
     path('working/section/<slug:section>/<int:year>/<int:month>', WorkingSectionMonthlyView.as_view(), name='section-monthly'),
     path('working/section/<slug:section>/<int:year>/<int:month>/<int:day>', WorkingSectionDailyListView.as_view(), name='section-daily'),
     path('working/section/<slug:section>/<int:year>/<int:month>/<int:day>/delete', deleteWorking, name='section-daily-delete'),
+    path('working/section/<slug:section>/<int:year>/<int:month>/<int:day>/process/<slug:action>', actionWorking, name='section-daily-action'),
     path('working/section/<slug:section>/<int:year>/<int:month>/upload', import_working_data, name='section-upload'),
     path('working/section/<slug:section>/<int:year>/<int:month>/download', export_working_xls, name='section-download'),
     path('working/section/<slug:section>/<int:year>/<int:month>/download/<slug:company>', export_working_csv, name='section-download-csv'),
