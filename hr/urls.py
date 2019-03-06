@@ -22,6 +22,8 @@ from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
 )
+from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib.auth.views import LoginView,LogoutView
 
 from django.urls import path
@@ -34,6 +36,7 @@ urlpatterns = [
     url(r'^logout', LogoutView.as_view(),name='logout'),
     url(r'^schedule/', include(('schedule.urls','schedule'),namespace='schedule')),
     url(r'^employee/', include(('employee.urls','employee'),namespace='employee')),
+    url(r'^attendance/', include(('attendance.urls','attendance'),namespace='attendance')),
 
     
     url(r'^api/', include(router.urls)),
@@ -45,20 +48,27 @@ urlpatterns = [
     url(r'^api/login/', include(('employee.urls','user'),namespace='login')),
     url(r'^api/token/$', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     url(r'^api/token/refresh/$', TokenRefreshView.as_view(), name='token_refresh'),
-]
+]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
-from django.conf.urls.static import static
-from django.conf import settings
+# if settings.DEBUG:
+#     import debug_toolbar
+#     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+#     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+#     urlpatterns += [url(r'^__debug__/', include(debug_toolbar.urls))]
+
+# from django.conf.urls.static import static
+# from django.conf import settings
 
 if settings.DEBUG:
     import debug_toolbar
     urlpatterns = [
         path('__debug__/', include(debug_toolbar.urls)),
-
-        # For django versions before 2.0:
+            # For django versions before 2.0:
         # url(r'^__debug__/', include(debug_toolbar.urls)),
 
     ] + urlpatterns
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     
 # if settings.DEBUG:
 #     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

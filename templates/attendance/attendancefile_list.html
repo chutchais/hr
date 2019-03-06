@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% load schedule_tag %}
+
+{% block title %}
+LCB1 & LCMT 
+{% endblock %}
+
+
+   {% block stylesheet %}
+   <style type="text/css">
+   table {
+    max-width: 100%;
+	}
+
+    th {
+    background-color: #C0DAFF;
+    color: black;
+	}
+
+
+
+	</style>
+    {% endblock stylesheet %}
+
+
+{% block content %}
+<div class="container">
+	<h1>Attendance Log file List</h1>
+
+	{% if is_paginated %}
+		  {% if page_obj.has_previous %}
+		    <a href="?{% param_replace page=1 %}">First</a>
+		    {% if page_obj.previous_page_number != 1 %}
+		      <a href="?{% param_replace page=page_obj.previous_page_number %}">Previous</a>
+		    {% endif %}
+		  {% endif %}
+
+		  Page {{ page_obj.number }} of {{ paginator.num_pages }}
+
+		  {% if page_obj.has_next %}
+		    {% if page_obj.next_page_number != paginator.num_pages %}
+		      <a href="?{% param_replace page=page_obj.next_page_number %}">Next</a>
+		    {% endif %}
+		    <a href="?{% param_replace page=paginator.num_pages %}">Last</a>
+		  {% endif %}
+
+		  <p>Workings {{ page_obj.start_index }}—{{ page_obj.end_index }}</p>
+		{% endif %}
+		
+	<div class="row">
+		{% if perms.attendance.import_attendance_file %}
+			<a class="btn btn-info" role="button" href="{% url 'attendance:upload' %}">Upload Attendance file</a>
+		{% endif %}
+		<table border=1 width="1024">
+					<thead>
+					<tr>
+						<th>Name</th>
+						<th>Description</th>
+		   				<th>Date</th>
+		   				<th>Upload?</th>
+		   				<th>Upload Date</th>
+		   				<th>Actions</th>
+	 				</tr>
+	 				</thead>
+	 				<tbody>
+
+						{% for obj in object_list %}
+							<tr>
+								<td>
+									<a href="{% url 'attendance:detail' obj.pk %}">
+										{{obj.name}}
+									</a>
+								</td>
+								
+								<td>{{obj.description}}</td>
+								<td>{{obj.created_date}}</td>
+								<td class="text-center">
+									{% if obj.uploaded %}
+										<i class="fa fa-check-circle" style="font-size:24px;color:green"></i>
+									{% else %}
+										<i class="fa fa-close" style="font-size:24px;color:red"></i>
+										
+									{% endif %}
+								</td>
+								<td>
+									{{obj.uploaded_date|default_if_none:"--"}}
+								</td>
+								<td>
+									{% if obj.uploaded == False %}
+										{% if perms.attendance.process_attendance_file %}
+											<a class="btn btn-info" role="button" href="{% url 'attendance:process' obj.pk  %}">Process file</a>
+										{% endif %}
+									{% endif %}
+
+									{% if perms.attendance.import_attendance_file  %}
+											<a class="btn btn-danger" role="button" href="{% url 'attendance:delete' obj.pk  %}">Delete file</a>
+									{% endif %}
+								</td>
+							</tr>
+						{% endfor %}
+					</tbody>
+		</table>
+	</div>
+	<br>
+	{% if hr_staff %}
+		<h1>Upload Time Attendance Log</h1>
+	{% endif %}
+
+
+
+</div>
+{% endblock content %}

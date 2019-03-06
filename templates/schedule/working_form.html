@@ -10,14 +10,17 @@ Create working
 
 {% block content %}
 	<div class="container">
-		<h1>{{title}} : 
+		<h1>
 			{% if object %}
-			<small>{{object.user}} on {{object.working_date}}</small>
+				{{object.user}} on {{object.working_date}}
+			{% else %}
+				{{title}} 
 			{% endif %}
 		</h1>
 		
 		<div class="row">
 	    	<div class="col">
+	    		<h3>Working</h3>
 				<form method="post">
 			        {% csrf_token %}
 			        {{ form.as_p }}
@@ -88,9 +91,36 @@ Create working
 			    {% endif %}
 			</div>
 			<div class="col">
-				<h3>Logs</h3>
+				
 				
 						{% if object %}
+
+
+					    	{% if object.get_attendance %}
+					    		<h3>Time attendance</h3>
+					    		<table class="table table-striped">
+									<thead>
+										<tr>
+											<th>Date</th>
+											<th>Stamp Date</th>
+											<th>Machine</th>
+											<th>Detail</th>
+										</tr>
+									</thead>
+									<tbody>
+					    		{% for ta in object.get_attendance %}
+					    			<tr>
+							    		<td>{{ta.stamp_date}}</td>
+										<td>{{ta.stamp_time}}</td>
+										<td>{{ta.source}}</td>
+										<td>{{ta.stamp_status}}</td>
+							    	</tr>
+						    	{% endfor %}
+						    	</tbody>
+					    		</table>
+						    {% endif %}
+
+						    <h3>Logs</h3>
 							<table class="table table-striped">
 							<thead>
 								<tr>
@@ -111,7 +141,10 @@ Create working
 					    	{% endfor %}
 					    	</tbody>
 					    	</table>
+
 					    {% endif %}
+
+					    
 				
 			</div>
 

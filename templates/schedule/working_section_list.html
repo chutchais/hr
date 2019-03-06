@@ -26,6 +26,9 @@ LCB1 & LCMT
 {% block content %}
 <div class="container">
 	<h1>Department/Section List</h1>
+	{% if perms.attendance.import_attendance_file or perms.attendance.process_attendance_file %}
+		<h3><a href="{% url 'attendance:list' %}">Time Attendance Log.</a></h3>
+	{% endif %}
 	<div class="row">
 
 		{% for d in department %}
@@ -43,19 +46,11 @@ LCB1 & LCMT
 			</div>
 		{% endfor %}
 	</div>
+	<br>
+
+	
+
+
+
 </div>
 {% endblock content %}
-
-
- <div class="col">
-				<h3>Section list for {{department}}</h3>
-				<table>
-				{% for section in section_list %}
-					<tr>
-						 <td><a href="{% url 'schedule:section-detail' section.name %}">{{section}} </a></td>
-					</tr>
-				{% endfor %}
-				</table>
-		
-
-		</div>

@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% load schedule_tag %}
+
+{% block title %}
+LCB1 & LCMT 
+{% endblock %}
+
+
+   {% block stylesheet %}
+   <style type="text/css">
+   table {
+    max-width: 100%;
+	}
+
+    th {
+    background-color: #C0DAFF;
+    color: black;
+	}
+
+
+
+	</style>
+    {% endblock stylesheet %}
+
+
+{% block content %}
+<div class="container">
+	<h1>Attendance Log file Detail</h1>
+
+
+		
+	<div class="row">
+
+		<table border=1 width="1024">
+					<thead>
+					<tr>
+						<th>Item</th>
+						<th>Detail</th>
+	 				</tr>
+	 				</thead>
+	 				<tbody>
+
+							<tr>
+								<td>
+									File name
+								</td>
+								<td>
+									<a href="{{object.filename.url }}">
+										{{object.name}}
+									</a>
+								</td>
+							</tr>
+
+							<tr>
+								<td>
+									Description
+								</td>
+								<td>
+									{{object.description}}
+								</td>
+							</tr>
+
+							<tr>
+								<td>
+									Created Date
+								</td>
+								<td>
+									{{object.created_date}}
+								</td>
+							</tr>
+
+							<tr>
+								<td>
+									Uploaded?
+								</td>
+
+								<td >
+									{% if object.uploaded %}
+										<i class="fa fa-check-circle" style="font-size:24px;color:green"></i>
+									{% else %}
+										<i class="fa fa-close" style="font-size:24px;color:red"></i>
+										
+									{% endif %}
+								</td>
+
+							</tr>
+
+							<tr>
+								<td>Upload date</td>
+								<td>
+									{{object.uploaded_date|default_if_none:"--"}}
+								</td>
+							</tr>
+							
+							<tr>
+								<td>Actions</td>
+								<td>
+									{% if object.uploaded == False %}
+										{% if perms.attendance.process_attendance_file %}
+											<a class="btn btn-info" role="button" href="">Process file</a>
+										{% endif %}
+									{% endif %}
+										{% if perms.attendance.import_attendance_file  %}
+											<a class="btn btn-danger" role="button" href="{% url 'attendance:delete' object.pk  %}">Delete file</a>
+										{% endif %}
+								</td>
+							</tr>
+
+
+					</tbody>
+		</table>
+	</div>
+	<br>
+
+
+
+
+</div>
+{% endblock content %}

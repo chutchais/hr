@@ -6,6 +6,7 @@ from django.core.exceptions import ValidationError
 from colorfield.fields import ColorField
 from department.models import Section
 from employee.models import User
+from attendance.models import Attendance
 
 from log.models import Log
 
@@ -142,3 +143,11 @@ class Working(models.Model):
 
 	def get_absolute_url(self):
 		return reverse('schedule:detail', kwargs={'pk': self.pk})
+
+	def get_attendance(self):
+		from datetime import timedelta
+		ta = Attendance.objects.filter(user=self.user,
+										stamp_date__range = [self.working_date
+										,self.working_date +  timedelta(days=1)]).order_by('stamp_date')
+		return ta
+

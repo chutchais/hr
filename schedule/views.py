@@ -391,8 +391,15 @@ def get_working_from_sheet(request,filehandle):
 				
 				# working_code = WorkingCode.objects.get(name='D1',section=section)
 				code = xl_sheet.cell(row_index, i+2).value.__str__().strip().replace('.0','')
+				if code=='':
+					continue
+
+
 				workingcode = WorkingCode.objects.get(name=code,section=section)
 				# print (working_month.replace(day=i),workingcode)
+
+				if not workingcode :
+					continue
 
 
 				# Check exisiting
@@ -455,9 +462,11 @@ class WorkingSectionListView(LoginRequiredMixin,ListView):
 		if user.groups.filter(name__in=['HR staff']).exists():
 			context['section_list'] = Section.objects.all().order_by('department','name')
 			context['department'] = Department.objects.all()
+			context['hr_staff'] = True
 		else:
 			context['section_list'] = Section.objects.filter(department = section.department).order_by('name')
 			context['department'] = Department.objects.filter(name=department)
+			context['hr_staff'] = False
 		return context
 
 
