@@ -4,6 +4,7 @@ import os
 def upload_employee(data):
 	try :
 		url = "http://192.168.10.20:8011/employee/upload"
+		# url = "http://127.0.0.1:8000/employee/upload"
 		service = 'employee'
 		import urllib3
 		http = urllib3.PoolManager()
@@ -26,9 +27,12 @@ def upload_employee(data):
 
 import sys
 from openpyxl import load_workbook
-wb2 = load_workbook('C:\\Users\\Chutchai\\Documents\\Project Plan\\2019\\HR-OT system\\Namelist-ENG2.xlsx',read_only=True)
-ws = wb2['Sheet1']
+wb2 = load_workbook('C:\\Users\\Chutchai\\Documents\\Project Plan\\2019\\HR-OT system\\all_employee.xlsx',read_only=True)
+ws = wb2['LCMT-PRO']
 first_row = True
+# print ('Total row : %s' % w
+# 	s.rows.length())
+# sys.exit()
 for row in ws.rows :
 	if first_row :
 		first_row = False
@@ -39,7 +43,7 @@ for row in ws.rows :
 	section 	=  row[6].value
 	company 	=  row[7].value
 	data ={
-		'username' : ('%s.%s')%(first_name,last_name[:1]),
+		'username' : ('%s.%s')%(first_name,last_name[:2]),
 		'en' : en,
 		'first_name' : first_name,
 		'last_name'  : last_name,

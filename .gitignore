@@ -1,4 +1,7 @@
 *.pyc
+attendance/*.pyc
+attendance/migrations/*.pyc
+attendance/migrations/*.py
 company/*.pyc
 company/migrations/*.pyc
 company/migrations/*.py
@@ -18,3 +21,4 @@ schedule/migrations/*.pyc
 db.sqlite3
 media/
 static/
+statics/
