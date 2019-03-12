@@ -172,6 +172,9 @@ class Working(models.Model):
 	def get_attendance(self):
 		from datetime import timedelta
 		t1,t2 = self.get_actual_working_time()
+		if t1 == None or t2 == None:
+			return None
+			
 		ta = Attendance.objects.filter(user=self.user,
 										stamp_datetime__range = [t1 - timedelta(hours=2),
 																 t2 + timedelta(hours=6)]).order_by('stamp_date')
