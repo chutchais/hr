@@ -145,6 +145,9 @@ def get_working(user,year,month,day):
 	# 	if working.user == user and working.working_date.year == year and working.working_date.month == month and working.working_date.day == day :
 	# 		return working
 
+@register.simple_tag
+def get_working_status(working):
+	return working.get_attendance_status()
 
 
 

@@ -19,6 +19,8 @@ from django.shortcuts import redirect
 from django.utils import timezone
 import sys
 import json
+from django.http import HttpResponseForbidden
+from django.http import Http404
 
 from .models import User
 from company.models import Company
@@ -72,15 +74,15 @@ def upload(request):
 
 @api_view(["POST"])
 def login(request):
-    username = request.data.get("username")
-    password = request.data.get("password")
+	username = request.data.get("username")
+	password = request.data.get("password")
 
-    user = authenticate(username=username, password=password)
-    if not user:
-        return Response({"error": "Login failed"}, status=HTTP_401_UNAUTHORIZED)
+	user = authenticate(username=username, password=password)
+	if not user:
+		return Response({"error": "Login failed"}, status=HTTP_401_UNAUTHORIZED)
 
-    token, _ = Token.objects.get_or_create(user=user)
-    return Response({"token": token.key})
+	token, _ = Token.objects.get_or_create(user=user)
+	return Response({"token": token.key})
 
 
 class UserListView(LoginRequiredMixin,ListView):
@@ -88,18 +90,28 @@ class UserListView(LoginRequiredMixin,ListView):
 
 class UserDetailView(LoginRequiredMixin,DetailView):
 	model = User
+	context_object_name = 'emp'
+
 	def get_context_data(self, **kwargs):
 		context     = super().get_context_data(**kwargs)
-		user 		= self.request.user
-		# section 	= user.section
-		# department 	= section.department
-		# # print(user.groups.all())
-		# year = self.request.GET.get('year', None)
-		# month = self.request.GET.get('month', None)
-
-		# display mode (mode=None --> show Working Code(default) , mode=Status -->show status mode)
-		mode = self.request.GET.get('mode', None)
-		report_date 	= timezone.now()
-		context['now'] 	= report_date
+		mode 				= self.request.GET.get('mode', None)
+		report_date 		= timezone.now()
+		context['now'] 		= report_date
 		context['mode'] 	= mode
 		return context
+
+	def get(self, request, *args, **kwargs):
+		try:
+			self.object = self.get_object()
+			user 		= self.request.user
+			section 	= user.section
+			department 	= section.department
+			# # print ('Object Department %s' % self.object.section.department)
+			# # print ('Request Department %s' % department)
+			if (self.object.section.department != department) and not user.groups.filter(name__in=['HR staff']).exists() :
+				return HttpResponseForbidden()
+		except Http404:
+			# redirect here
+			return redirect('\'')
+		context = self.get_context_data(object=self.object)
+		return self.render_to_response(context)

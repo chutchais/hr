@@ -30,13 +30,28 @@ Employee Detail
             <h1>
                 {{object}} -- {{object.section}}
                 
-                {% if mode == 'status' %}
+             <!--    {% if mode == 'status' %}
                       <a href="{% url 'employee:employee-detail' object.pk %}"><small><small><small>working code mode</small></small></small></a>
                    
                   {% else %}
                     <a href="?{% query_transform request mode='status' %}"><small><small><small>status mode</small></small></small></a>
                     
+                  {% endif %} -->
+
+                  {% if mode == 'status' %}
+
+                      <a href="{% url 'employee:employee-detail' object.pk %}"><i class="fa fa-retweet" style="font-size:24px;color:blue"></i></small></a>
+                                        
+                  {% else %}
+                    
+
+                    <a href="{% url 'employee:employee-detail' object.pk %}?mode=status"><i class="fa fa-retweet" style="font-size:24px;color:red"></i></a>
+
                   {% endif %}
+
+                  <a href="{% url 'employee:employee-detail' object.pk %}?mode=ta">
+                        <i class="fa fa-clock-o" style="font-size:24px;color:gray"></i></a>
+
 
             </h1>
 
@@ -120,12 +135,38 @@ Employee Detail
 
                               {% if user_working %}
                       
-                                  {% if mode == 'status' %}
-                                        <td class="text-center">
-                                          <a href='{% url "schedule:detail" user_working.pk %}?next={{ request.get_full_path| urlencode }}'>
-                                          <span class="{{user_working.get_status_style}}">{{user_working.workingcode.name}}</span>
-                                          </a>
-                                        </td>
+                                  {% if mode == 'status' or mode == 'ta' %}
+                                         {% if mode == 'status' %}
+                                            <td class="text-center">
+                                              <a href='{% url "schedule:detail" user_working.pk %}?next={{ request.get_full_path| urlencode }}'>
+                                              <span class="{{user_working.get_status_style}}">{{user_working.workingcode.name}}</span>
+                                              </a>
+                                            </td>
+                                            {% endif %}
+                                            {% if mode == 'ta' %}
+                                                  <!-- Time Atttendance Mode -->
+                                                  {% get_working_status user_working as working_status %}
+                                                  
+                                                  <td class="text-center">
+                                                    <a href='{% url "schedule:detail" user_working.pk %}?next={{ request.get_full_path| urlencode }}'>
+                                                      {% if working_status == 0 %}
+                                                            <i class="fa fa-certificate" aria-hidden="true" style="color:gray"></i>
+                                                      {% elif working_status == 1 %}
+                                                             <i class="fa fa-asterisk" aria-hidden="true" style="color:gray"></i>
+                                                      {% elif working_status == 2 %}
+                                                            <i class="fa fa-hourglass" aria-hidden="true" style="color:green"></i>
+                                                      {% elif working_status == 3 %}
+                                                          <i class="fa fa-hourglass" aria-hidden="true" style="color:orange"></i>
+                                                      {% elif working_status == 4 %}
+                                                          <i class="fa fa-hourglass-start" aria-hidden="true" style="color:red"></i>
+                                                      {% else %}
+                                                          <i class="fa fa-hourglass" aria-hidden="true" style="color:gray"></i>
+                                                      {% endif %}
+                                                    </a>
+                                                </td>
+                                            {% endif %}
+
+
                                       {% else %}
                                         <td {{user_working.get_working_style|safe}} > 
                                           <a href='{% url "schedule:detail" user_working.pk %}?next={{ request.get_full_path| urlencode }}'>

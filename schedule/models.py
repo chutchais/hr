@@ -144,10 +144,100 @@ class Working(models.Model):
 	def get_absolute_url(self):
 		return reverse('schedule:detail', kwargs={'pk': self.pk})
 
+
+	def get_actual_working_time(self):
+		from datetime import timedelta
+		import datetime
+
+		if self.workingcode.start_time == None or self.workingcode.end_time == None:
+			return None,None
+
+		# if self.workingcode.start_time < self.workingcode.end_time: #same day
+		# 	t1 = datetime.datetime.combine(self.working_date,self.workingcode.start_time)-  timedelta(hours=2)
+		# 	t2 = datetime.datetime.combine(self.working_date,self.workingcode.end_time) + timedelta(hours=6)
+		# else:
+		# 	t1 = datetime.datetime.combine(self.working_date,self.workingcode.start_time)-  timedelta(hours=2)
+		# 	t2 = datetime.datetime.combine(self.working_date+timedelta(days=1) ,self.workingcode.end_time) + timedelta(hours=6)
+
+		if self.workingcode.start_time < self.workingcode.end_time: #same day
+			t1 = datetime.datetime.combine(self.working_date,self.workingcode.start_time)
+			t2 = datetime.datetime.combine(self.working_date,self.workingcode.end_time)
+		else:
+			t1 = datetime.datetime.combine(self.working_date,self.workingcode.start_time)
+			t2 = datetime.datetime.combine(self.working_date+timedelta(days=1) ,self.workingcode.end_time)
+
+	
+		return t1,t2
+
 	def get_attendance(self):
 		from datetime import timedelta
+		t1,t2 = self.get_actual_working_time()
 		ta = Attendance.objects.filter(user=self.user,
-										stamp_date__range = [self.working_date
-										,self.working_date +  timedelta(days=1)]).order_by('stamp_date')
+										stamp_datetime__range = [t1 - timedelta(hours=2),
+																 t2 + timedelta(hours=6)]).order_by('stamp_date')
 		return ta
+
+	
+
+
+	def get_attendance_status(self):
+		from datetime import timedelta
+		import datetime
+		# Off 
+		if self.workingcode.name=='OFF':
+			return 0
+	
+		# Working but No Attendance data
+		ta = self.get_attendance()
+		if not ta:
+			return 1
+
+		# Complate In and Out attendance
+		t1,t2 = self.get_actual_working_time()
+		in_ontime = False
+		in_found = False
+		out_ontime = False
+		out_found = False
+		for t in ta:
+			# print(t1,t2, t.stamp_datetime)
+			if not in_found and (t.stamp_datetime <= t1 and t.stamp_datetime > t1-timedelta(hours=4) ) :
+				in_found = True
+				in_ontime = True
+				# print('Found in -- On time')
+				continue
+
+			if not in_found and (t.stamp_datetime > t1 and t.stamp_datetime <= t1+timedelta(hours=4) ) :
+				in_found = True
+				in_ontime = False
+				# print('Found in -- Late')
+				continue
+
+			# Out
+			if not out_found and (t.stamp_datetime >= t2 and t.stamp_datetime <= t2+timedelta(hours=6) ) :
+				out_found = True
+				out_ontime = True
+				# print('Found out -- On time')
+				continue
+
+			if not out_found and t.stamp_datetime >= t2-timedelta(hours=4)  :
+				out_found = True
+				out_ontime = False
+				# print('Found out -- Ealier')
+				continue
+
+		# Found only either In or Out (Scan not completed)
+		if not (in_found and out_found):
+			return 4
+
+		# Found In/Out and Ontime In/Out (Perfect)
+		if in_found and in_ontime and out_found and out_ontime:
+			return 2
+
+		# Found In/Out and some Late or Ealier
+		if (in_found and out_found) and not (in_ontime and out_ontime):
+			return 3
+
+
+
+		return 0
 

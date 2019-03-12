@@ -87,6 +87,7 @@ def process_file(request,pk):
 				    user = user,
 				    stamp_date = stamp_date,
 					stamp_time = stamp_time,
+					stamp_datetime = datetime.datetime.combine(stamp_date,stamp_time),
 					defaults={'stamp_status': fn ,
 								'source': source,
 								'attendancefile': fileObj}

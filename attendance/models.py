@@ -1,6 +1,6 @@
 from django.db import models
 from django.db.models.signals import pre_save,post_save
-
+import datetime
 
 from employee.models import User
 # Create your models here.
@@ -46,6 +46,7 @@ class Attendance(models.Model):
 							related_name = 'attendances')
 	stamp_date		= models.DateField()
 	stamp_time		= models.TimeField()
+	stamp_datetime	= models.DateTimeField(blank=True, null=True)
 	stamp_status	= models.CharField(max_length=5,null = True,blank = True)
 	source		 	= models.CharField(max_length=10,null = True,blank = True)
 	created_date	= models.DateTimeField(auto_now_add=True)
